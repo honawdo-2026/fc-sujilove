@@ -5,27 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FC 수지사랑 - 개인 포인트 조회</title>
 
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="수지사랑 조회">
-    
-    <link rel="icon" type="image/png" sizes="192x192" href="../logo_1.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="../logo_1.png">
-    <link rel="apple-touch-icon" href="../logo_1.png">
-    
-    <link rel="manifest" href="../member_manifest.json">
-    <meta name="theme-color" content="#059669">
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('../service-worker.js')
-                .then(reg => console.log('SW 등록 성공'))
-                .catch(err => console.log('SW 등록 실패', err));
-            });
-        }
-    </script>
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -34,12 +13,15 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; }
         
-        #kakao-notice {
-            display: none;
-            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-            background: #fee500; color: #1e1e1e; padding: 12px;
-            text-align: center; font-weight: bold; font-size: 14px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        /* [핵심] 메달 색상 구분을 위한 CSS 필터 */
+        .medal-gold {
+            filter: saturate(1.8) brightness(1.2) drop-shadow(0 0 4px rgba(255, 215, 0, 0.5));
+        }
+        .medal-silver {
+            filter: saturate(0.8) brightness(1.1);
+        }
+        .medal-bronze {
+            filter: saturate(1.2) brightness(0.7) contrast(1.1);
         }
 
         .fc-luxury-title {
@@ -51,16 +33,9 @@
 
         @keyframes float {
             0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-8px); }
             100% { transform: translateY(0px); }
         }
-
-        .btn-premium {
-            background: linear-gradient(135deg, #065f46 0%, #059669 100%);
-            box-shadow: 0 10px 20px -5px rgba(5, 150, 105, 0.4);
-            transition: all 0.2s ease;
-        }
-        .btn-premium:active { transform: scale(0.95); }
 
         .card-bg { 
             background: white; border: 1px solid #e2e8f0; border-radius: 20px; 
@@ -70,80 +45,29 @@
 </head>
 <body class="pb-20">
 
-    <div id="kakao-notice">
-        앱 설치를 위해 <span style="text-decoration: underline;">오른쪽 하단 또는 상단 [⋮] → [다른 브라우저로 열기]</span>를 눌러주세요!
-    </div>
-
     <div id="login-overlay" class="fixed inset-0 z-[1000] bg-slate-50 flex items-center justify-center p-6">
         <div class="w-full max-w-sm text-center">
-            <div class="mb-10">
-                <img src="../logo_1.png" alt="FC 수지사랑" class="w-24 mx-auto mb-6" onerror="this.src='https://via.placeholder.com/100?text=FC+SJ'">
-                <h1 class="text-3xl font-black fc-luxury-title mb-2 tracking-tighter">FC 수지사랑</h1>
-                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.4em]">Member Portal</p>
-            </div>
-            
-            <div class="space-y-4">
-                <input type="text" id="user-name-input" placeholder="선수 이름을 입력하세요" 
-                    class="w-full h-16 bg-white rounded-2xl border-2 border-slate-200 focus:border-emerald-600 outline-none text-center text-xl font-bold text-slate-800 shadow-inner">
-                
-                <div class="flex items-center justify-center gap-2 mb-2">
-                    <input type="checkbox" id="remember-me" class="w-4 h-4 accent-emerald-600">
-                    <label for="remember-me" class="text-sm font-bold text-slate-500 cursor-pointer">이름 기억하기</label>
-                </div>
-
-                <button onclick="checkUser()" class="btn-premium w-full h-16 text-white rounded-2xl font-black text-lg">조회하기</button>
-                <p id="login-error" class="text-red-500 text-sm font-bold opacity-0 transition-opacity">등록된 선수가 아닙니다.</p>
-                
-                <button id="install-btn" style="display:none;" class="w-full py-3 bg-white border-2 border-emerald-600 text-emerald-600 rounded-2xl font-bold text-sm mt-4">
-                    📱 홈 화면에 앱 설치하기
-                </button>
-            </div>
+            <img src="../logo_1.png" class="w-24 mx-auto mb-6">
+            <h1 class="text-3xl font-black fc-luxury-title mb-10">FC 수지사랑</h1>
+            <input type="text" id="user-name-input" placeholder="이름을 입력하세요" class="w-full h-16 bg-white rounded-2xl border-2 border-slate-200 outline-none text-center text-xl font-bold mb-4">
+            <button onclick="checkUser()" class="w-full h-16 bg-emerald-600 text-white rounded-2xl font-black text-lg shadow-lg">조회하기</button>
         </div>
     </div>
 
     <div id="member-app" style="display: none;" class="max-w-md mx-auto p-6">
-        <header class="text-center mb-10 mt-6 bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 relative">
+        <header class="text-center mb-10 mt-6 bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100">
             <div id="my-medal-container" class="mb-4"></div>
             <h2 id="my-name-display" class="text-3xl font-black text-slate-900 mb-2"></h2>
             <div id="my-score-badge" class="inline-block px-8 py-2.5 rounded-full bg-slate-900 text-emerald-400 text-2xl font-black shadow-lg">0 P</div>
-            <p id="season-label" class="text-emerald-500/80 text-[11px] font-black mt-4 uppercase tracking-[0.2em]">Current Quarter Score</p>
+            <p id="season-label" class="text-emerald-500/80 text-[11px] font-black mt-4 tracking-[0.2em]">CURRENT SCORE</p>
         </header>
-        
-        <div class="flex items-center justify-between mb-4 px-2">
-            <h3 class="text-lg font-black text-slate-800 italic uppercase">Ranking List</h3>
-            <span class="text-[10px] font-bold text-slate-400">기준: 21P↑🥇 / 11P↑🥈 / 그외🥉</span>
-        </div>
 
         <div id="ranking-list" class="space-y-3"></div>
-        
-        <button onclick="logout()" class="w-full mt-12 py-4 text-slate-400 text-[11px] font-black uppercase tracking-widest border-b border-slate-200">← 다른 선수 조회하기</button>
+        <button onclick="location.reload()" class="w-full mt-12 py-4 text-slate-400 text-[11px] font-black uppercase tracking-widest border-b">← 다른 선수 조회하기</button>
     </div>
 
     <script>
-        const isKakao = /KAKAOTALK/i.test(navigator.userAgent);
-        if (isKakao) {
-            document.getElementById('kakao-notice').style.display = 'block';
-            document.body.style.paddingTop = '50px';
-        }
-
-        let deferredPrompt;
-        const installBtn = document.getElementById('install-btn');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.style.display = 'block';
-        });
-
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') installBtn.style.display = 'none';
-                deferredPrompt = null;
-            }
-        });
-
+        // 파이어베이스 설정 (기존 본인 정보 유지)
         const firebaseConfig = {
             apiKey: "AIzaSyAVvQNQaLlxu9Bp_vVGKNzkdN5QRN8n8-Y",
             authDomain: "fc-sujilove.firebaseapp.com",
@@ -156,16 +80,11 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        window.onload = function() {
-            const savedName = localStorage.getItem('fc_remembered_name');
-            if (savedName) document.getElementById('user-name-input').value = savedName;
-        };
-
-        // 메달 파일명을 반환하는 함수 (리스트와 헤더 공통 사용)
-        function getMedalFileName(score) {
-            if (score >= 21) return "gold_medal.png";
-            if (score >= 11) return "silver_medal.png";
-            return "bronze_medal.png";
+        // [핵심] 점수대별 메달 정보(클래스 포함)를 반환하는 함수
+        function getMedalInfo(score) {
+            if (score >= 21) return { file: "gold_medal.png", css: "medal-gold" };
+            if (score >= 11) return { file: "silver_medal.png", css: "medal-silver" };
+            return { file: "bronze_medal.png", css: "medal-bronze" };
         }
 
         function calculateScoreByQuarter(memberId, points, targetQ) {
@@ -191,22 +110,12 @@
                 const user = members.find(m => m.name === inputName);
 
                 if (user) {
-                    if (document.getElementById('remember-me').checked) {
-                        localStorage.setItem('fc_remembered_name', inputName);
-                    } else {
-                        localStorage.removeItem('fc_remembered_name');
-                    }
-
                     let latestQ = 1;
                     Object.keys(pData).forEach(k => {
                         const q = parseInt(k.split('-')[0]);
                         if (q > latestQ && (pData[k].a > 0 || pData[k].t > 0)) latestQ = q;
                     });
                     renderMemberPage(user, members, pData, latestQ);
-                } else {
-                    const err = document.getElementById('login-error');
-                    err.style.opacity = '1';
-                    setTimeout(() => err.style.opacity = '0', 2000);
                 }
             });
         }
@@ -219,9 +128,9 @@
             document.getElementById('my-name-display').innerText = currentUser.name;
             document.getElementById('my-score-badge').innerText = `${myScore} P`;
             
-            // 상단 큰 메달 설정
-            const myMedalFile = getMedalFileName(myScore);
-            document.getElementById('my-medal-container').innerHTML = `<img src="../${myMedalFile}" class="w-20 mx-auto" style="animation: float 3s infinite" onerror="this.style.display='none'">`;
+            const myMedal = getMedalInfo(myScore);
+            document.getElementById('my-medal-container').innerHTML = 
+                `<img src="../${myMedal.file}" class="w-20 mx-auto ${myMedal.css}" style="animation: float 3s infinite">`;
             
             document.getElementById('season-label').innerText = `${currentQ}분기 POINT SCORE`;
             
@@ -229,22 +138,20 @@
                                   .sort((a, b) => b.qScore - a.qScore);
 
             document.getElementById('ranking-list').innerHTML = sorted.map((m, idx) => {
-                const medalFile = getMedalFileName(m.qScore);
+                const medalInfo = getMedalInfo(m.qScore);
                 const isMe = m.id === currentUser.id;
                 
                 return `
                 <div class="card-bg p-4 flex items-center justify-between ${isMe ? 'ring-2 ring-emerald-500 bg-emerald-50' : ''}">
                     <div class="flex items-center gap-3">
                         <span class="text-xs font-black ${isMe ? 'text-emerald-600' : 'text-slate-400'} w-4">${idx + 1}</span>
-                        <img src="../${medalFile}" class="w-6 h-6 object-contain" onerror="this.style.opacity='0'">
+                        <img src="../${medalInfo.file}" class="w-6 h-6 object-contain ${medalInfo.css}">
                         <div class="font-black text-[15px] ${isMe ? 'text-emerald-700' : 'text-slate-800'}">${m.name}</div>
                     </div>
                     <div class="text-xl font-black ${isMe ? 'text-emerald-600' : 'text-slate-700'}">${m.qScore} P</div>
                 </div>`;
             }).join('');
         }
-
-        function logout() { location.reload(); }
     </script>
 </body>
 </html>
