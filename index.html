@@ -83,10 +83,12 @@
                 <input type="password" id="pw-input" inputmode="numeric" placeholder="접속 암호 입력" 
                     class="w-full h-14 bg-slate-100 rounded-2xl text-center text-xl font-bold border-2 border-transparent focus:border-emerald-500 focus:bg-white outline-none transition-all">
                 <button onclick="checkPassword()" class="w-full h-14 bg-emerald-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-emerald-900/20 active:scale-95 transition-all">관리자 접속</button>
+                
                 <button onclick="location.href='member/position.html'" class="w-full h-14 tactics-btn rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3">
                     <svg width="18" height="26" viewBox="0 0 18 26" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="1" width="16" height="24" rx="1" ry="1"></rect><line x1="1" y1="13" x2="17" y2="13"></line><circle cx="9" cy="13" r="3.5"></circle></svg>
-                    조회 페이지 이동
+                    전술판 바로가기
                 </button>
+                
                 <p id="error-msg" class="text-red-500 text-xs font-bold opacity-0 transition-opacity">비밀번호가 일치하지 않습니다.</p>
             </div>
         </div>
@@ -147,7 +149,7 @@
                 if (data) {
                     members = data.members || [];
                     pData = data.points || {};
-                    sortData(); // 데이터 로드 시 현재 선택 주차 기준으로 정렬
+                    sortData(); 
                 }
             });
         }
@@ -183,11 +185,12 @@
         function selectW(w) {
             selW = w; updateBtnUI('w-wrap', `w${w}`);
             document.getElementById('view-title').innerText = `2025년 ${selQ}분기 ${selM}월 ${selW}주차 누적`;
-            sortData(); // [핵심] 주차 선택 시 즉시 누적 점수 높은 순으로 정렬
+            sortData(); 
         }
 
         function updateBtnUI(pid, aid) { document.querySelectorAll(`#${pid} button`).forEach(b => b.classList.toggle('active', b.id === aid)); }
 
+        // 분기별 누적 포인트 합산 로직 (현재 분기 내에서만 누적)
         function getCumulativeScore(memberId) {
             let total = 0;
             const monthsInQuarter = selQ === 1 ? [1,2,3] : selQ === 2 ? [4,5,6] : selQ === 3 ? [7,8,9] : [10,11,12];
@@ -234,7 +237,6 @@
         function addMember() { const n = prompt('이름:'); if(n) { members.push({id: Date.now(), name: n}); syncToFirebase(); } }
         function deleteMember() { const n = prompt('삭제할 이름:'); if(n) { const idx = members.findIndex(m => m.name === n); if(idx !== -1) { members.splice(idx, 1); syncToFirebase(); } } }
         
-        // 정렬 함수: 누적 점수 기준으로 내림차순 정렬
         function sortData() { 
             members.sort((a,b) => getCumulativeScore(b.id) - getCumulativeScore(a.id)); 
             render(); 
