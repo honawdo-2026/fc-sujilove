@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <link rel="icon" type="image/png" sizes="192x192" href="../logo_1.png">
-    <link rel="apple-touch-icon" href="../logo_1.png">
-    
-    <link rel="manifest" href="../member_manifest.json">
-    
-    <meta name="theme-color" content="#059669">
-    <meta name="mobile-web-app-capable" content="yes">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FC 수지사랑 - 개인 포인트 조회</title>
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="수지사랑 조회">
+    
+    <link rel="icon" type="image/png" sizes="192x192" href="../logo_1.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="../logo_1.png">
+    <link rel="apple-touch-icon" href="../logo_1.png">
+    <link rel="shortcut icon" href="../logo_1.png">
+
+    <link rel="manifest" href="../member_manifest.json">
+    
+    <meta name="theme-color" content="#059669">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -66,7 +72,7 @@
     <div id="login-overlay" class="fixed inset-0 z-[1000] bg-slate-50 flex items-center justify-center p-6">
         <div class="w-full max-w-sm text-center">
             <div class="mb-10">
-                <img src="../logo.png" alt="FC 수지사랑" class="w-24 mx-auto mb-6" onerror="this.src='https://via.placeholder.com/100?text=FC+SJ'">
+                <img src="../logo_1.png" alt="FC 수지사랑" class="w-24 mx-auto mb-6" onerror="this.src='https://via.placeholder.com/100?text=FC+SJ'">
                 <h1 class="text-3xl font-black fc-luxury-title mb-2 tracking-tighter">FC 수지사랑</h1>
                 <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.4em]">Member Portal</p>
             </div>
@@ -134,10 +140,8 @@
             return `<img src="../${medalFile}" class="w-20 mx-auto medal-animate" onerror="this.style.display='none'">`;
         }
 
-        // [핵심] 가장 최근 데이터가 있는 분기를 찾아 해당 분기 점수만 합산
         function getLatestQuarterScore(memberId, points) {
             let latestQ = 1;
-            // 1. 데이터가 존재하는 가장 높은 분기 찾기
             for (let q = 1; q <= 4; q++) {
                 for (let m = 1; m <= 12; m++) {
                     for (let w = 1; w <= 5; w++) {
@@ -149,7 +153,6 @@
                 }
             }
 
-            // 2. 해당 분기(latestQ)의 점수만 합산
             let qTotal = 0;
             const months = latestQ === 1 ? [1,2,3] : latestQ === 2 ? [4,5,6] : latestQ === 3 ? [7,8,9] : [10,11,12];
             for (let m of months) {
@@ -196,19 +199,16 @@
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('member-app').style.display = 'block';
 
-            // 현재 사용자의 최신 분기 점수 정보 가져오기
             const myInfo = getLatestQuarterScore(currentUser.id, points);
             
             document.getElementById('my-name-display').innerText = currentUser.name;
             document.getElementById('my-score-badge').innerText = `${myInfo.score} P`;
             document.getElementById('my-medal-container').innerHTML = getMedalImg(myInfo.score);
             
-            // 문구 업데이트 (밝은 에메랄드 색상 반영)
             const label = document.getElementById('season-label');
             label.innerText = `${myInfo.quarter}분기 POINT SCORE`;
             document.getElementById('ranking-title').innerText = `${myInfo.quarter}Q RANKING`;
 
-            // 랭킹 리스트도 동일한 분기 기준으로 정렬
             const sorted = members.map(m => {
                 const info = getLatestQuarterScore(m.id, points);
                 return { ...m, qScore: info.score, qNum: info.quarter };
