@@ -12,11 +12,19 @@
     <link rel="icon" type="image/png" sizes="192x192" href="../logo_1.png">
     <link rel="icon" type="image/png" sizes="512x512" href="../logo_1.png">
     <link rel="apple-touch-icon" href="../logo_1.png">
-    <link rel="shortcut icon" href="../logo_1.png">
-
-    <link rel="manifest" href="../member_manifest.json">
     
+    <link rel="manifest" href="../member_manifest.json">
     <meta name="theme-color" content="#059669">
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('../service-worker.js')
+                .then(reg => console.log('Service Worker 등록 성공'))
+                .catch(err => console.log('Service Worker 등록 실패:', err));
+            });
+        }
+    </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -140,36 +148,23 @@
             return `<img src="../${medalFile}" class="w-20 mx-auto medal-animate" onerror="this.style.display='none'">`;
         }
 
-        function getLatestQuarterScore(memberId, points) {
-            let latestQ = 1;
-            for (let q = 1; q <= 4; q++) {
-                for (let m = 1; m <= 12; m++) {
-                    for (let w = 1; w <= 5; w++) {
-                        const key = `${q}-${m}-${w}-${memberId}`;
-                        if (points[key] && (points[key].a > 0 || points[key].t > 0)) {
-                            latestQ = q;
-                        }
-                    }
-                }
-            }
-
+        function calculateScoreByQuarter(memberId, points, targetQ) {
             let qTotal = 0;
-            const months = latestQ === 1 ? [1,2,3] : latestQ === 2 ? [4,5,6] : latestQ === 3 ? [7,8,9] : [10,11,12];
+            const months = targetQ === 1 ? [1,2,3] : targetQ === 2 ? [4,5,6] : targetQ === 3 ? [7,8,9] : [10,11,12];
             for (let m of months) {
                 for (let w = 1; w <= 5; w++) {
-                    const key = `${latestQ}-${m}-${w}-${memberId}`;
+                    const key = `${targetQ}-${m}-${w}-${memberId}`;
                     if (points[key]) {
                         qTotal += (Number(points[key].a) || 0) + (Number(points[key].t) || 0);
                     }
                 }
             }
-            return { score: qTotal, quarter: latestQ };
+            return qTotal;
         }
 
         function checkUser() {
             const inputName = document.getElementById('user-name-input').value.trim();
             const rememberMe = document.getElementById('remember-me').checked;
-            
             if (!inputName) return;
 
             db.ref('fc_suji_v9').once('value').then((snapshot) => {
@@ -181,12 +176,22 @@
                 const user = members.find(m => m.name === inputName);
 
                 if (user) {
+                    let globalLatestQ = 1;
+                    Object.keys(pData).forEach(key => {
+                        const q = parseInt(key.split('-')[0]);
+                        const val = pData[key];
+                        if (q > globalLatestQ && (val.a > 0 || val.t > 0)) {
+                            globalLatestQ = q;
+                        }
+                    });
+
                     if (rememberMe) {
                         localStorage.setItem('fc_remembered_name', inputName);
                     } else {
                         localStorage.removeItem('fc_remembered_name');
                     }
-                    renderMemberPage(user, members, pData);
+                    
+                    renderMemberPage(user, members, pData, globalLatestQ);
                 } else {
                     const errorMsg = document.getElementById('login-error');
                     errorMsg.style.opacity = '1';
@@ -195,23 +200,22 @@
             });
         }
 
-        function renderMemberPage(currentUser, members, points) {
+        function renderMemberPage(currentUser, members, points, currentQ) {
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('member-app').style.display = 'block';
 
-            const myInfo = getLatestQuarterScore(currentUser.id, points);
+            const myScore = calculateScoreByQuarter(currentUser.id, points, currentQ);
             
             document.getElementById('my-name-display').innerText = currentUser.name;
-            document.getElementById('my-score-badge').innerText = `${myInfo.score} P`;
-            document.getElementById('my-medal-container').innerHTML = getMedalImg(myInfo.score);
+            document.getElementById('my-score-badge').innerText = `${myScore} P`;
+            document.getElementById('my-medal-container').innerHTML = getMedalImg(myScore);
             
-            const label = document.getElementById('season-label');
-            label.innerText = `${myInfo.quarter}분기 POINT SCORE`;
-            document.getElementById('ranking-title').innerText = `${myInfo.quarter}Q RANKING`;
+            document.getElementById('season-label').innerText = `${currentQ}분기 POINT SCORE`;
+            document.getElementById('ranking-title').innerText = `${currentQ}Q RANKING`;
 
             const sorted = members.map(m => {
-                const info = getLatestQuarterScore(m.id, points);
-                return { ...m, qScore: info.score, qNum: info.quarter };
+                const score = calculateScoreByQuarter(m.id, points, currentQ);
+                return { ...m, qScore: score };
             }).sort((a, b) => b.qScore - a.qScore);
 
             document.getElementById('ranking-list').innerHTML = sorted.map((m, idx) => {
