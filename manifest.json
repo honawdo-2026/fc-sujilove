@@ -1,0 +1,20 @@
+{
+  "short_name": "FC수지사랑",
+  "name": "FC 수지사랑 포인트 매니저",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/fc-sujilove/index.html",
+  "display": "standalone",
+  "theme_color": "#065f46",
+  "background_color": "#ffffff"
+}
