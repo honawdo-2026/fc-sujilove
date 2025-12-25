@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FC 수지사랑 - 개인 포인트 조회</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; }
+
+        .fc-luxury-title {
+            background: linear-gradient(135deg, #0f172a 0%, #059669 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-style: italic;
+        }
+
+        @keyframes floatMedal {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .medal-animate {
+            animation: floatMedal 3s ease-in-out infinite;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+            box-shadow: 0 10px 20px -5px rgba(5, 150, 105, 0.4);
+            transition: all 0.2s ease;
+        }
+        .btn-premium:active { transform: scale(0.95); }
+
+        .card-bg { 
+            background: white; border: 1px solid #e2e8f0; border-radius: 20px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .custom-checkbox {
+            width: 18px; height: 18px; border-radius: 6px; border: 2px solid #cbd5e1;
+            appearance: none; cursor: pointer; transition: all 0.2s; position: relative;
+        }
+        .custom-checkbox:checked { background-color: #059669; border-color: #059669; }
+        .custom-checkbox:checked::after {
+            content: '✓'; color: white; position: absolute; font-size: 12px; font-weight: bold;
+            left: 50%; top: 50%; transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body class="pb-20">
+
+    <div id="login-overlay" class="fixed inset-0 z-[1000] bg-slate-50 flex items-center justify-center p-6">
+        <div class="w-full max-w-sm text-center">
+            <div class="mb-10">
+                <img src="../logo.png" alt="FC 수지사랑" class="w-24 mx-auto mb-6" onerror="this.src='https://via.placeholder.com/100?text=FC+SJ'">
+                <h1 class="text-3xl font-black fc-luxury-title mb-2 tracking-tighter">FC 수지사랑</h1>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.4em]">Member Portal</p>
+            </div>
+            
+            <div class="space-y-4">
+                <input type="text" id="user-name-input" placeholder="선수 이름을 입력하세요" 
+                    class="w-full h-16 bg-white rounded-2xl border-2 border-slate-200 focus:border-emerald-600 outline-none text-center text-xl font-bold text-slate-800 shadow-inner">
+                
+                <div class="flex items-center justify-center gap-2 mb-2">
+                    <input type="checkbox" id="remember-me" class="custom-checkbox">
+                    <label for="remember-me" class="text-sm font-bold text-slate-500 cursor-pointer">이름 기억하기</label>
+                </div>
+
+                <button onclick="checkUser()" class="btn-premium w-full h-16 text-white rounded-2xl font-black text-lg">조회하기</button>
+                <p id="login-error" class="text-red-500 text-sm font-bold opacity-0 transition-opacity">등록된 선수가 아닙니다.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="member-app" style="display: none;" class="max-w-md mx-auto p-6">
+        <header class="text-center mb-10 mt-6 bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 relative">
+            <div id="my-medal-container" class="mb-4"></div>
+            <h2 id="my-name-display" class="text-3xl font-black text-slate-900 mb-2"></h2>
+            <div id="my-score-badge" class="inline-block px-8 py-2.5 rounded-full bg-slate-900 text-emerald-400 text-2xl font-black shadow-lg">0 P</div>
+            <p id="season-label" class="text-emerald-500/80 text-[11px] font-black mt-4 uppercase tracking-[0.2em]">Current Quarter Score</p>
+        </header>
+
+        <section>
+            <div class="flex items-center justify-between mb-6 px-2">
+                <h3 id="ranking-title" class="text-lg font-black text-slate-900 italic uppercase tracking-tight">Quarter Ranking</h3>
+                <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase">Realtime Update</span>
+            </div>
+            <div id="ranking-list" class="space-y-3"></div>
+        </section>
+        
+        <button onclick="logout()" class="w-full mt-12 py-4 text-slate-400 text-[11px] font-black uppercase tracking-widest border-b border-slate-200">
+            ← 다른 선수 조회하기
+        </button>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVvQNQaLlxu9Bp_vVGKNzkdN5QRN8n8-Y",
+            authDomain: "fc-sujilove.firebaseapp.com",
+            databaseURL: "https://fc-sujilove-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fc-sujilove",
+            storageBucket: "fc-sujilove.firebasestorage.app",
+            messagingSenderId: "157843616872",
+            appId: "1:157843616872:web:d9703b157d93166cb177dd"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        window.onload = function() {
+            const savedName = localStorage.getItem('fc_remembered_name');
+            if (savedName) {
+                document.getElementById('user-name-input').value = savedName;
+                document.getElementById('remember-me').checked = true;
+            }
+        };
+
+        function getMedalImg(score) {
+            let medalFile = score >= 21 ? "gold_medal.png" : (score >= 11 ? "silver_medal.png" : "bronze_medal.png");
+            return `<img src="../${medalFile}" class="w-20 mx-auto medal-animate" onerror="this.style.display='none'">`;
+        }
+
+        // [핵심] 가장 최근 데이터가 있는 분기를 찾아 해당 분기 점수만 합산
+        function getLatestQuarterScore(memberId, points) {
+            let latestQ = 1;
+            // 1. 데이터가 존재하는 가장 높은 분기 찾기
+            for (let q = 1; q <= 4; q++) {
+                for (let m = 1; m <= 12; m++) {
+                    for (let w = 1; w <= 5; w++) {
+                        const key = `${q}-${m}-${w}-${memberId}`;
+                        if (points[key] && (points[key].a > 0 || points[key].t > 0)) {
+                            latestQ = q;
+                        }
+                    }
+                }
+            }
+
+            // 2. 해당 분기(latestQ)의 점수만 합산
+            let qTotal = 0;
+            const months = latestQ === 1 ? [1,2,3] : latestQ === 2 ? [4,5,6] : latestQ === 3 ? [7,8,9] : [10,11,12];
+            for (let m of months) {
+                for (let w = 1; w <= 5; w++) {
+                    const key = `${latestQ}-${m}-${w}-${memberId}`;
+                    if (points[key]) {
+                        qTotal += (Number(points[key].a) || 0) + (Number(points[key].t) || 0);
+                    }
+                }
+            }
+            return { score: qTotal, quarter: latestQ };
+        }
+
+        function checkUser() {
+            const inputName = document.getElementById('user-name-input').value.trim();
+            const rememberMe = document.getElementById('remember-me').checked;
+            
+            if (!inputName) return;
+
+            db.ref('fc_suji_v9').once('value').then((snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+
+                const members = data.members || [];
+                const pData = data.points || {};
+                const user = members.find(m => m.name === inputName);
+
+                if (user) {
+                    if (rememberMe) {
+                        localStorage.setItem('fc_remembered_name', inputName);
+                    } else {
+                        localStorage.removeItem('fc_remembered_name');
+                    }
+                    renderMemberPage(user, members, pData);
+                } else {
+                    const errorMsg = document.getElementById('login-error');
+                    errorMsg.style.opacity = '1';
+                    setTimeout(() => errorMsg.style.opacity = '0', 2500);
+                }
+            });
+        }
+
+        function renderMemberPage(currentUser, members, points) {
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('member-app').style.display = 'block';
+
+            // 현재 사용자의 최신 분기 점수 정보 가져오기
+            const myInfo = getLatestQuarterScore(currentUser.id, points);
+            
+            document.getElementById('my-name-display').innerText = currentUser.name;
+            document.getElementById('my-score-badge').innerText = `${myInfo.score} P`;
+            document.getElementById('my-medal-container').innerHTML = getMedalImg(myInfo.score);
+            
+            // 문구 업데이트 (밝은 에메랄드 색상 반영)
+            const label = document.getElementById('season-label');
+            label.innerText = `${myInfo.quarter}분기 POINT SCORE`;
+            document.getElementById('ranking-title').innerText = `${myInfo.quarter}Q RANKING`;
+
+            // 랭킹 리스트도 동일한 분기 기준으로 정렬
+            const sorted = members.map(m => {
+                const info = getLatestQuarterScore(m.id, points);
+                return { ...m, qScore: info.score, qNum: info.quarter };
+            }).sort((a, b) => b.qScore - a.qScore);
+
+            document.getElementById('ranking-list').innerHTML = sorted.map((m, idx) => {
+                const isMe = m.id === currentUser.id;
+                const listMedal = m.qScore >= 21 ? "../gold_medal.png" : (m.qScore >= 11 ? "../silver_medal.png" : "../bronze_medal.png");
+
+                return `
+                <div class="card-bg p-4 flex items-center justify-between ${isMe ? 'ring-2 ring-emerald-500 bg-emerald-50' : ''}">
+                    <div class="flex items-center gap-4">
+                        <span class="text-[10px] font-black ${isMe ? 'text-emerald-600' : 'text-slate-400'} w-4">${idx + 1}</span>
+                        <img src="${listMedal}" class="w-8 h-8 object-contain" onerror="this.style.opacity='0.2'">
+                        <div class="font-black text-[15px] ${isMe ? 'text-emerald-700' : 'text-slate-800'}">${m.name}</div>
+                    </div>
+                    <div class="text-xl font-black ${isMe ? 'text-emerald-600' : 'text-slate-700'}">${m.qScore} P</div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function logout() {
+            const rememberMe = document.getElementById('remember-me').checked;
+            if (!rememberMe) {
+                document.getElementById('user-name-input').value = '';
+            }
+            document.getElementById('member-app').style.display = 'none';
+            document.getElementById('login-overlay').style.display = 'flex';
+        }
+
+        document.getElementById('user-name-input').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') checkUser();
+        });
+    </script>
+</body>
+</html>
