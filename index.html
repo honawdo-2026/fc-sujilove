@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FC 수지사랑 Point Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        body { font-family: 'Pretendard', sans-serif; background-color: #f1f5f9; color: #334155; margin: 0; }
+        
+        #login-screen {
+            position: fixed; inset: 0; z-index: 1000;
+            background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .bg-pattern {
+            position: absolute; width: 200%; height: 200%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l15 30-15 30L15 30z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+            transform: rotate(-15deg); pointer-events: none;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px); padding: 40px 24px; border-radius: 32px;
+            width: 85%; max-width: 360px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center; z-index: 10;
+        }
+
+        .app-logo { width: 85px; height: 85px; object-fit: contain; margin: 0 auto 16px; }
+
+        .app-title-main {
+            font-size: 22px; font-weight: 900; font-style: italic;
+            background: linear-gradient(90deg, #065f46 0%, #10b981 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .tactics-btn {
+            background: #ffffff; color: #15803d; border: 2px solid #15803d;
+        }
+
+        /* 버튼 텍스트 간격 조정 */
+        .btn-text-spaced { letter-spacing: 0.3em; margin-right: -0.3em; }
+
+        .filter-btn { 
+            background: white; border-radius: 14px; font-size: 13px; font-weight: 700; 
+            color: #64748b; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #e2e8f0;
+        }
+        .q-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
+        .m-btn.active { background: #4f46e5; color: white; border-color: #4f46e5; }
+        .w-btn.active { background: #0d9488; color: white; border-color: #0d9488; }
+
+        @keyframes floatEffect {
+            0% { opacity: 0; transform: translate(-50%, 0); }
+            30% { opacity: 1; transform: translate(-50%, -25px); }
+            100% { opacity: 0; transform: translate(-50%, -50px); }
+        }
+        .plus-animation {
+            position: absolute; left: 50%; top: 0; z-index: 100;
+            color: #2563eb; font-weight: 900; font-size: 1.3rem;
+            pointer-events: none; animation: floatEffect 0.8s ease-out forwards;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        /* 메달 이모지 크기 */
+        .medal-icon { font-size: 1.2rem; margin-right: 4px; }
+    </style>
+</head>
+<body class="pb-32">
+
+    <section id="login-screen">
+        <div class="bg-pattern"></div>
+        <div class="login-card">
+            <div class="mb-8">
+                <img src="logo.png" alt="FC 수지사랑 로고" class="app-logo">
+                <h1 class="app-title-main">FC 수지사랑</h1>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Point Manager System</p>
+            </div>
+            <div class="space-y-4">
+                <input type="password" id="pw-input" inputmode="numeric" placeholder="접속 암호 입력" 
+                    class="w-full h-14 bg-slate-100 rounded-2xl text-center text-xl font-bold border-2 border-transparent focus:border-emerald-500 focus:bg-white outline-none transition-all">
+                <button onclick="checkPassword()" class="w-full h-14 bg-emerald-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-emerald-900/20 active:scale-95 transition-all">관리자 접속</button>
+                <button onclick="location.href='member/position.html'" class="w-full h-14 tactics-btn rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3">
+                    <svg width="18" height="26" viewBox="0 0 18 26" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="1" width="16" height="24" rx="1" ry="1"></rect><line x1="1" y1="13" x2="17" y2="13"></line><circle cx="9" cy="13" r="3.5"></circle></svg>
+                    전술판 이동
+                </button>
+                <p id="error-msg" class="text-red-500 text-xs font-bold opacity-0 transition-opacity">비밀번호가 일치하지 않습니다.</p>
+            </div>
+        </div>
+    </section>
+
+    <div id="main-app" class="hidden">
+        <header class="sticky top-0 z-50 bg-white/75 backdrop-blur-xl border-b border-slate-200 p-4 space-y-4">
+            <div class="flex justify-between items-center px-1">
+                <div class="flex flex-col">
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Manager Mode</span>
+                    <span class="app-title-main text-sm text-emerald-600">Cloud Sync Active</span>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="addMember()" class="text-[10px] bg-emerald-600 text-white px-3 py-2 rounded-full font-black shadow-md">+ 추가</button>
+                    <button onclick="deleteMember()" class="text-[10px] bg-slate-800 text-white px-3 py-2 rounded-full font-black shadow-md">- 삭제</button>
+                </div>
+            </div>
+            <div class="space-y-3">
+                <div class="grid grid-cols-4 gap-2" id="q-wrap">
+                    <button onclick="selectQ(1)" id="q1" class="filter-btn q-btn h-10">1분기</button>
+                    <button onclick="selectQ(2)" id="q2" class="filter-btn q-btn h-10">2분기</button>
+                    <button onclick="selectQ(3)" id="q3" class="filter-btn q-btn h-10">3분기</button>
+                    <button onclick="selectQ(4)" id="q4" class="filter-btn q-btn h-10">4분기</button>
+                </div>
+                <div id="m-wrap" class="grid grid-cols-3 gap-2"></div>
+                <div id="w-wrap" class="flex gap-2 overflow-x-auto pb-1 no-scrollbar"></div>
+            </div>
+        </header>
+
+        <main class="p-5">
+            <div class="flex items-center gap-3 mb-6 bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+                <h2 id="view-title" class="text-[14px] font-extrabold text-slate-800 tracking-tight flex-1"></h2>
+                <button onclick="sortData()" class="flex items-center justify-center p-2 bg-slate-50 rounded-xl hover:bg-slate-100 border border-slate-200">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2.5"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/></svg>
+                </button>
+            </div>
+            <div id="list-container" class="space-y-4"></div>
+        </main>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVvQNQaLlxu9Bp_vVGKNzkdN5QRN8n8-Y",
+            authDomain: "fc-sujilove.firebaseapp.com",
+            databaseURL: "https://fc-sujilove-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fc-sujilove",
+            storageBucket: "fc-sujilove.firebasestorage.app",
+            messagingSenderId: "157843616872",
+            appId: "1:157843616872:web:d9703b157d93166cb177dd"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let members = []; let pData = {}; let selQ = 1, selM = 1, selW = 1;
+
+        function loadData() {
+            db.ref('fc_suji_v9').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    members = data.members || [];
+                    pData = data.points || {};
+                    render();
+                }
+            });
+        }
+        function syncToFirebase() { db.ref('fc_suji_v9').set({ members, points: pData, lastUpdated: Date.now() }); }
+        
+        function checkPassword() {
+            if(document.getElementById('pw-input').value === '2025') {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-app').classList.remove('hidden');
+                init();
+            } else {
+                document.getElementById('error-msg').style.opacity = '1';
+                setTimeout(() => { document.getElementById('error-msg').style.opacity = '0'; }, 2000);
+            }
+        }
+
+        function init() { loadData(); selectQ(1); }
+        function selectQ(q) {
+            selQ = q; updateBtnUI('q-wrap', `q${q}`);
+            const ms = q === 1 ? [1,2,3] : q === 2 ? [4,5,6] : q === 3 ? [7,8,9] : [10,11,12];
+            document.getElementById('m-wrap').innerHTML = ms.map(m => `<button onclick="selectM(${m})" id="m${m}" class="filter-btn m-btn h-10">${m}월</button>`).join('');
+            selectM(ms[0]);
+        }
+        function selectM(m) {
+            selM = m; updateBtnUI('m-wrap', `m${m}`);
+            document.getElementById('w-wrap').innerHTML = [1,2,3,4,5].map(w => `<button onclick="selectW(${w})" id="w${w}" class="filter-btn w-btn min-w-[64px] h-9 text-[12px]">${w}주</button>`).join('');
+            selectW(1);
+        }
+        function selectW(w) {
+            selW = w; updateBtnUI('w-wrap', `w${w}`);
+            document.getElementById('view-title').innerText = `2025년 ${selQ}분기 ${selM}월 ${selW}주차 누적`;
+            render();
+        }
+        function updateBtnUI(pid, aid) { document.querySelectorAll(`#${pid} button`).forEach(b => b.classList.toggle('active', b.id === aid)); }
+
+        function getCumulativeScore(memberId) {
+            let total = 0;
+            const months = selQ === 1 ? [1,2,3] : selQ === 2 ? [4,5,6] : selQ === 3 ? [7,8,9] : [10,11,12];
+            for (let m of months) {
+                for (let w = 1; w <= 5; w++) {
+                    if (m > selM || (m === selM && w > selW)) break;
+                    const key = `${selQ}-${m}-${w}-${memberId}`;
+                    if (pData[key]) total += (Number(pData[key].a) || 0) + (Number(pData[key].t) || 0);
+                }
+            }
+            return total;
+        }
+
+        // 포인트별 메달 생성 함수
+        function getMedal(score) {
+            if (score >= 50) return '<span class="medal-icon">🥇</span>';
+            if (score >= 30) return '<span class="medal-icon">🥈</span>';
+            if (score >= 10) return '<span class="medal-icon">🥉</span>';
+            return '<span class="medal-icon">⚽</span>';
+        }
+
+        function toggleAttend(mid, btn) {
+            const key = `${selQ}-${selM}-${selW}-${mid}`;
+            if(!pData[key]) pData[key] = {a:0, t:0};
+            if(pData[key].a === 0) {
+                pData[key].a = 3;
+                const ani = document.createElement('div');
+                ani.className = 'plus-animation'; ani.innerText = '+3P';
+                btn.appendChild(ani); setTimeout(() => ani.remove(), 800);
+            } else { pData[key].a = 0; }
+            syncToFirebase();
+        }
+
+        function changeTrain(mid, v) {
+            const key = `${selQ}-${selM}-${selW}-${mid}`;
+            if(!pData[key]) pData[key] = {a:0, t:0};
+            pData[key].t = (pData[key].t || 0) + v;
+            syncToFirebase();
+        }
+
+        function addMember() { const n = prompt('이름:'); if(n) { members.push({id: Date.now(), name: n}); syncToFirebase(); } }
+        function deleteMember() { const n = prompt('삭제할 이름:'); if(n) { const idx = members.findIndex(m => m.name === n); if(idx !== -1) { members.splice(idx, 1); syncToFirebase(); } } }
+        function sortData() { members.sort((a,b) => getCumulativeScore(b.id) - getCumulativeScore(a.id)); render(); }
+
+        function render() {
+            const container = document.getElementById('list-container');
+            if (!container) return;
+            container.innerHTML = members.map(m => {
+                const cum = getCumulativeScore(m.id);
+                const cur = pData[`${selQ}-${selM}-${selW}-${m.id}`] || {a:0, t:0};
+                return `
+                <div class="bg-white p-5 rounded-[24px] flex items-center justify-between border border-slate-100 shadow-sm">
+                    <div class="flex items-center gap-2">
+                        ${getMedal(cum)}
+                        <div>
+                            <div class="text-[17px] font-black text-slate-800">${m.name}</div>
+                            <div class="text-[14px] font-black text-indigo-600">${cum}P</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="toggleAttend(${m.id}, this)" class="w-16 h-14 rounded-2xl font-black text-[12px] transition-all ${cur.a===3 ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}">
+                            <span class="btn-text-spaced">${cur.a===3 ? '참 석' : '미 참'}</span>
+                        </button>
+                        
+                        <div class="flex flex-col items-center gap-1 bg-emerald-50 p-2 rounded-2xl border border-emerald-100 min-w-[70px]">
+                            <span class="text-[11px] font-black text-emerald-600 uppercase">훈 련</span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="changeTrain(${m.id},-1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg font-black text-emerald-400 shadow-sm">-</button>
+                                <span class="w-4 text-center font-black text-emerald-700 text-sm">${cur.t || 0}</span>
+                                <button onclick="changeTrain(${m.id},1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg font-black text-emerald-600 shadow-sm">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        document.getElementById('pw-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') checkPassword(); });
+    </script>
+</body>
+</html>

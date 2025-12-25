@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FC 수지사랑 - 전략 보드판</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        
+        body { 
+            font-family: 'Pretendard', sans-serif; 
+            background-color: #0f172a; margin: 0; padding: 0;
+            overflow-x: hidden; touch-action: pan-y;
+        }
+
+        /* [축구장 디자인] */
+        .pitch-container { padding: 15px; display: flex; justify-content: center; position: relative; }
+        .pitch {
+            width: 100%; max-width: 360px; aspect-ratio: 2/3;
+            background-color: #15803d; border: 3px solid #ffffff; position: relative; 
+            border-radius: 4px; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .pitch-stripes {
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 10%, transparent 10%, transparent 20%);
+        }
+
+        /* 경기장 라인 */
+        .line { position: absolute; border: 1.5px solid rgba(255,255,255,0.7); pointer-events: none; }
+        .center-line { top: 50%; left: 0; right: 0; height: 0; transform: translateY(-50%); }
+        .center-circle { top: 50%; left: 50%; width: 70px; height: 70px; border-radius: 50%; transform: translate(-50%, -50%); }
+        .penalty-box-top { top: 0; left: 50%; width: 160px; height: 60px; transform: translateX(-50%); border-top: 0; }
+        .penalty-box-bottom { bottom: 0; left: 50%; width: 160px; height: 60px; transform: translateX(-50%); border-bottom: 0; }
+        .goal-post { position: absolute; left: 50%; transform: translateX(-50%); width: 50px; height: 4px; background: white; z-index: 5; }
+
+        /* [선수 이름 박스 - 크기 절대 고정] */
+        .player-chip {
+            width: 54px !important; /* 어떤 상황에서도 54px 고정 */
+            height: 32px;
+            background: #ffffff; color: #1e293b;
+            border: 1.5px solid #334155; border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 800;
+            cursor: pointer; z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            touch-action: none; user-select: none; -webkit-user-select: none;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+
+        .is-dragging {
+            opacity: 0.9; transform: scale(1.1);
+            z-index: 9999 !important; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* [벤치 영역 - 폴드 등 넓은 화면 대응] */
+        .bench {
+            background: #1e293b; border-radius: 25px 25px 0 0;
+            padding: 20px 15px 100px 15px; min-height: 400px;
+        }
+        .bench-grid { 
+            display: flex; 
+            flex-wrap: wrap; /* 옆으로 늘어나는 대신 줄바꿈 처리 */
+            justify-content: center; /* 중앙 정렬 */
+            gap: 10px; 
+        }
+
+        /* 초기화 버튼 강조 스타일 */
+        .btn-reset {
+            color: #10b981;
+            font-size: 16px;
+            font-weight: 800;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            padding: 8px 20px;
+            transition: all 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="text-center py-5">
+        <h1 class="text-white text-lg font-black italic tracking-tight mb-1">FC SUJI TACTICS</h1>
+        <button onclick="location.reload()" class="btn-reset">
+            초기화
+        </button>
+    </header>
+
+    <div class="pitch-container">
+        <div class="goal-post" style="top: -2px;"></div>
+        <div id="field" class="pitch">
+            <div class="pitch-stripes"></div>
+            <div class="line center-line"></div>
+            <div class="line center-circle"></div>
+            <div class="line penalty-box-top"></div>
+            <div class="line penalty-box-bottom"></div>
+        </div>
+        <div class="goal-post" style="bottom: -2px;"></div>
+    </div>
+
+    <div class="bench">
+        <p class="text-slate-500 text-[10px] font-black mb-4 uppercase text-center tracking-widest">Bench Players</p>
+        <div id="player-bench" class="bench-grid">
+            </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAVvQNQaLlxu9Bp_vVGKNzkdN5QRN8n8-Y",
+            authDomain: "fc-sujilove.firebaseapp.com",
+            databaseURL: "https://fc-sujilove-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fc-sujilove",
+            storageBucket: "fc-sujilove.firebasestorage.app",
+            messagingSenderId: "157843616872",
+            appId: "1:157843616872:web:d9703b157d93166cb177dd"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function loadPlayers() {
+            db.ref('fc_suji_v9/members').once('value', (snapshot) => {
+                const members = snapshot.val() || [];
+                const bench = document.getElementById('player-bench');
+                bench.innerHTML = members.map(m => `
+                    <div class="player-chip" onpointerdown="startDragging(event)">
+                        ${m.name}
+                    </div>
+                `).join('');
+            });
+        }
+
+        let currentItem = null;
+        let offset = { x: 0, y: 0 };
+
+        function startDragging(e) {
+            currentItem = e.currentTarget;
+            const rect = currentItem.getBoundingClientRect();
+            
+            // 드래그 시점에 현재 너비를 픽셀로 고정하여 늘어남 방지
+            const fixedWidth = rect.width;
+            const fixedHeight = rect.height;
+
+            offset.x = e.clientX - rect.left;
+            offset.y = e.clientY - rect.top;
+
+            currentItem.classList.add('is-dragging');
+            currentItem.style.position = 'fixed';
+            currentItem.style.width = fixedWidth + 'px';
+            currentItem.style.height = fixedHeight + 'px';
+            currentItem.style.left = rect.left + 'px';
+            currentItem.style.top = rect.top + 'px';
+
+            currentItem.setPointerCapture(e.pointerId);
+
+            currentItem.onpointermove = (ev) => {
+                if (!currentItem) return;
+                currentItem.style.left = (ev.clientX - offset.x) + 'px';
+                currentItem.style.top = (ev.clientY - offset.y) + 'px';
+            };
+
+            currentItem.onpointerup = (ev) => {
+                const field = document.getElementById('field');
+                const bench = document.getElementById('player-bench');
+                const fieldRect = field.getBoundingClientRect();
+                
+                const dropX = ev.clientX;
+                const dropY = ev.clientY;
+
+                currentItem.classList.remove('is-dragging');
+                currentItem.releasePointerCapture(ev.pointerId);
+
+                if (dropX > fieldRect.left && dropX < fieldRect.right &&
+                    dropY > fieldRect.bottom < fieldRect.bottom || // 하단 판정 수정
+                    (dropX > fieldRect.left && dropX < fieldRect.right && dropY > fieldRect.top && dropY < fieldRect.bottom)) {
+                    
+                    const xInside = dropX - fieldRect.left - offset.x;
+                    const yInside = dropY - fieldRect.top - offset.y;
+
+                    currentItem.style.position = 'absolute';
+                    currentItem.style.left = xInside + 'px';
+                    currentItem.style.top = yInside + 'px';
+                    // 경기장에 들어올 때도 너비 고정 유지
+                    currentItem.style.width = '54px';
+                    field.appendChild(currentItem);
+                } else {
+                    currentItem.style.position = 'static';
+                    // 벤치로 돌아갈 때도 너비 고정 유지
+                    currentItem.style.width = '54px';
+                    bench.appendChild(currentItem);
+                }
+
+                currentItem.onpointermove = null;
+                currentItem.onpointerup = null;
+                currentItem = null;
+            };
+        }
+
+        window.onload = loadPlayers;
+    </script>
+</body>
+</html>
