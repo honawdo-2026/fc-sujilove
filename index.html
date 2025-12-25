@@ -43,7 +43,6 @@
             background: #ffffff; color: #15803d; border: 2px solid #15803d;
         }
 
-        /* 버튼 텍스트 간격 조정 */
         .btn-text-spaced { letter-spacing: 0.3em; margin-right: -0.3em; }
 
         .filter-btn { 
@@ -67,8 +66,7 @@
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
 
-        /* 메달 이모지 크기 */
-        .medal-icon { font-size: 1.2rem; margin-right: 4px; }
+        .medal-icon { font-size: 1.4rem; min-width: 28px; text-align: center; }
     </style>
 </head>
 <body class="pb-32">
@@ -198,12 +196,11 @@
             return total;
         }
 
-        // 포인트별 메달 생성 함수
+        // [수정] 요청하신 포인트 구간별 메달 로직
         function getMedal(score) {
-            if (score >= 50) return '<span class="medal-icon">🥇</span>';
-            if (score >= 30) return '<span class="medal-icon">🥈</span>';
-            if (score >= 10) return '<span class="medal-icon">🥉</span>';
-            return '<span class="medal-icon">⚽</span>';
+            if (score >= 21) return '<span class="medal-icon">🥇</span>'; // 21P 이상 금메달
+            if (score >= 11) return '<span class="medal-icon">🥈</span>'; // 11P~20P 은메달
+            return '<span class="medal-icon">🥉</span>'; // 0P~10P 동메달
         }
 
         function toggleAttend(mid, btn) {
@@ -237,7 +234,7 @@
                 const cur = pData[`${selQ}-${selM}-${selW}-${m.id}`] || {a:0, t:0};
                 return `
                 <div class="bg-white p-5 rounded-[24px] flex items-center justify-between border border-slate-100 shadow-sm">
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-3">
                         ${getMedal(cum)}
                         <div>
                             <div class="text-[17px] font-black text-slate-800">${m.name}</div>
