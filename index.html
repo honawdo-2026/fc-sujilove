@@ -147,10 +147,11 @@
                 if (data) {
                     members = data.members || [];
                     pData = data.points || {};
-                    render();
+                    sortData(); 
                 }
             });
         }
+
         function syncToFirebase() { db.ref('fc_suji_v9').set({ members, points: pData, lastUpdated: Date.now() }); }
         
         function checkPassword() {
@@ -165,42 +166,51 @@
         }
 
         function init() { loadData(); selectQ(1); }
+
         function selectQ(q) {
             selQ = q; updateBtnUI('q-wrap', `q${q}`);
             const ms = q === 1 ? [1,2,3] : q === 2 ? [4,5,6] : q === 3 ? [7,8,9] : [10,11,12];
             document.getElementById('m-wrap').innerHTML = ms.map(m => `<button onclick="selectM(${m})" id="m${m}" class="filter-btn m-btn h-10">${m}월</button>`).join('');
             selectM(ms[0]);
         }
+
         function selectM(m) {
             selM = m; updateBtnUI('m-wrap', `m${m}`);
             document.getElementById('w-wrap').innerHTML = [1,2,3,4,5].map(w => `<button onclick="selectW(${w})" id="w${w}" class="filter-btn w-btn min-w-[64px] h-9 text-[12px]">${w}주</button>`).join('');
             selectW(1);
         }
+
         function selectW(w) {
             selW = w; updateBtnUI('w-wrap', `w${w}`);
             document.getElementById('view-title').innerText = `2025년 ${selQ}분기 ${selM}월 ${selW}주차 누적`;
-            render();
+            sortData(); 
         }
+
         function updateBtnUI(pid, aid) { document.querySelectorAll(`#${pid} button`).forEach(b => b.classList.toggle('active', b.id === aid)); }
 
+        // [수정 핵심] getCumulativeScore 함수: 오직 현재 선택된 분기(selQ)의 데이터만 합산
         function getCumulativeScore(memberId) {
             let total = 0;
-            const months = selQ === 1 ? [1,2,3] : selQ === 2 ? [4,5,6] : selQ === 3 ? [7,8,9] : [10,11,12];
-            for (let m of months) {
+            const monthsInQuarter = selQ === 1 ? [1,2,3] : selQ === 2 ? [4,5,6] : selQ === 3 ? [7,8,9] : [10,11,12];
+            
+            for (let m of monthsInQuarter) {
+                if (m > selM) break; 
                 for (let w = 1; w <= 5; w++) {
-                    if (m > selM || (m === selM && w > selW)) break;
-                    const key = `${selQ}-${m}-${w}-${memberId}`;
-                    if (pData[key]) total += (Number(pData[key].a) || 0) + (Number(pData[key].t) || 0);
+                    if (m === selM && w > selW) break;
+                    
+                    const key = `${selQ}-${m}-${w}-${memberId}`; // 분기(selQ) 정보가 키값에 포함되어 독립적으로 저장됨
+                    if (pData[key]) {
+                        total += (Number(pData[key].a) || 0) + (Number(pData[key].t) || 0);
+                    }
                 }
             }
             return total;
         }
 
-        // [수정] 요청하신 포인트 구간별 메달 로직
         function getMedal(score) {
-            if (score >= 21) return '<span class="medal-icon">🥇</span>'; // 21P 이상 금메달
-            if (score >= 11) return '<span class="medal-icon">🥈</span>'; // 11P~20P 은메달
-            return '<span class="medal-icon">🥉</span>'; // 0P~10P 동메달
+            if (score >= 21) return '<span class="medal-icon">🥇</span>';
+            if (score >= 11) return '<span class="medal-icon">🥈</span>';
+            return '<span class="medal-icon">🥉</span>';
         }
 
         function toggleAttend(mid, btn) {
@@ -224,7 +234,11 @@
 
         function addMember() { const n = prompt('이름:'); if(n) { members.push({id: Date.now(), name: n}); syncToFirebase(); } }
         function deleteMember() { const n = prompt('삭제할 이름:'); if(n) { const idx = members.findIndex(m => m.name === n); if(idx !== -1) { members.splice(idx, 1); syncToFirebase(); } } }
-        function sortData() { members.sort((a,b) => getCumulativeScore(b.id) - getCumulativeScore(a.id)); render(); }
+        
+        function sortData() { 
+            members.sort((a,b) => getCumulativeScore(b.id) - getCumulativeScore(a.id)); 
+            render(); 
+        }
 
         function render() {
             const container = document.getElementById('list-container');
