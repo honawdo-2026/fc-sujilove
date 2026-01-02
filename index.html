@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#065f46">
+    <meta name="theme-color" content="#0d141c">
     <link rel="apple-touch-icon" href="logo.png">
     <link rel="shortcut icon" href="logo.png">
     <meta charset="UTF-8">
@@ -16,112 +16,120 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         body { font-family: 'Pretendard', sans-serif; background-color: #f1f5f9; color: #334155; margin: 0; }
         
+        /* [수정] 로그인 화면: 상하 여백 추가 및 한 화면 구성 */
         #login-screen {
             position: fixed; inset: 0; z-index: 1000;
-            background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
-            display: flex; align-items: center; justify-content: center;
+            background: #0d141c;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            padding: 40px 20px; /* 상하 여백 넉넉히 주어 잘림 방지 */
             overflow-y: auto;
         }
 
         .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px); padding: 30px 24px; border-radius: 32px;
-            width: 90%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            text-align: center;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 24px; border-radius: 28px;
+            width: 100%; max-width: 360px; text-align: center; margin-bottom: 24px;
         }
 
-        /* 경기일정 전광판 스타일 */
-        .match-board {
-            background-color: #0d141c;
-            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 5px 5px; border: 4px solid #1e293b; border-radius: 24px;
-            padding: 20px; color: #ffffff; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-            margin-top: 20px; text-align: left;
+        /* 전광판 디자인 유지 */
+        .scoreboard {
+            width: 100%; max-width: 360px; 
+            background-color: #050a0f;
+            background-image: radial-gradient(#1e293b 1px, transparent 0);
+            background-size: 8px 8px; border-radius: 16px; padding: 20px;
+            border: 4px solid #1e293b; color: white;
+            margin-bottom: 12px;
         }
-        .match-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        .match-info-tag { color: #10b981; font-weight: 900; font-size: 12px; display: flex; align-items: center; gap: 6px; }
-        .match-info-tag::before { content: ''; width: 8px; height: 8px; background: #ff4d4d; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #ff4d4d; }
-        .board-row { display: flex; align-items: baseline; margin-bottom: 8px; }
-        .row-label { font-size: 11px; font-weight: 700; color: #64748b; width: 55px; flex-shrink: 0; }
-        .row-value { flex-grow: 1; font-size: 18px; font-weight: 900; color: #ffffff; text-align: center; padding-right: 35px; }
+        .sb-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #1e293b; padding-bottom: 8px; }
+        .sb-dot { color: #ff4d4d; margin-right: 6px; }
+        .sb-title { color: #10b981; font-weight: 900; font-size: 14px; }
+        .sb-date { color: #94a3b8; font-size: 14px; font-weight: 700; }
+        .sb-row { display: flex; margin-bottom: 10px; font-size: 15px; }
+        .sb-label { width: 60px; color: #94a3b8; font-weight: 800; }
+        .sb-val { flex: 1; color: #ffffff; font-weight: 800; }
 
-        /* 입력 폼 스타일 */
-        .input-box-wrap { background: #f8fafc; padding: 18px; border-radius: 20px; border: 1px solid #e2e8f0; margin-top: 15px; text-align: left; }
-        .input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-        .label-text { width: 50px; font-size: 12px; font-weight: 800; color: #475569; }
-        .input-el { flex: 1; height: 38px; background: #fff; border: 1px solid #cbd5e1; border-radius: 10px; padding: 0 10px; font-size: 13px; outline: none; }
-        .btn-confirm { background: #10b981; color: white; padding: 10px; border-radius: 10px; font-weight: 800; width: 100%; border: none; cursor: pointer; }
+        /* 수정 폼 스타일 */
+        #edit-form-panel { width: 100%; max-width: 360px; background: #1e293b; padding: 15px; border-radius: 12px; margin-top: 10px; }
+        .edit-input { background: #0d141c; border: 1px solid #334155; color: #10b981; padding: 6px 10px; border-radius: 6px; font-size: 12px; width: 100%; margin-bottom: 6px; }
 
-        /* 멤버 리스트 스타일 */
-        .member-card { background: white; border-radius: 32px; padding: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-        .q-btn.active { background-color: #065f46 !important; color: white !important; }
-        .m-btn.active { background-color: #10b981 !important; color: white !important; }
-        .w-btn.active { background-color: #34d399 !important; color: white !important; }
+        #main-app { min-height: 100vh; background-color: #f1f5f9; }
+        .app-title-main {
+            font-size: 20px; font-weight: 900; font-style: italic;
+            background: linear-gradient(90deg, #065f46 0%, #10b981 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .filter-btn { background: white; border-radius: 10px; font-size: 12px; font-weight: 700; color: #64748b; border: 1px solid #e2e8f0; }
+        .filter-btn.active { background: #059669; color: white; border-color: #059669; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="pb-32">
+<body class="pb-10">
 
     <section id="login-screen">
-        <div class="login-card">
-            <div class="mb-6">
-                <h1 class="text-2xl font-black text-emerald-800 italic tracking-tighter">FC SUJI SARANG</h1>
+        <div class="login-card shadow-2xl">
+            <img src="logo.png" alt="Logo" class="w-14 h-14 mx-auto mb-2">
+            <h1 class="app-title-main">FC 수지사랑</h1>
+            <p class="text-[9px] font-black text-slate-400 tracking-[0.2em] mb-4">POINT MANAGER</p>
+            <div class="space-y-2">
+                <input type="password" id="pw-input" inputmode="numeric" placeholder="접속 암호를 입력하세요" 
+                    class="w-full h-11 bg-slate-100 rounded-xl text-center font-bold border-2 border-slate-200 focus:border-emerald-500 outline-none">
+                <button onclick="checkPassword()" class="w-full h-11 bg-emerald-600 text-white rounded-xl font-black text-sm shadow-md active:scale-95 transition-all">관리자 접속</button>
+                
+                <button onclick="location.href='member/position.html'" class="w-full h-11 bg-white border-2 border-emerald-600 text-emerald-600 rounded-xl font-black text-sm flex items-center justify-center gap-2">
+                    <span>🏟️</span> 전술판 바로가기
+                </button>
+                
+                <p id="error-msg" class="text-red-500 text-[10px] font-bold opacity-0 transition-opacity">비밀번호가 일치하지 않습니다.</p>
             </div>
+        </div>
 
-            <div id="auth-area" class="space-y-3">
-                <input type="password" id="pw-input" inputmode="numeric" placeholder="접속 암호" class="w-full h-14 bg-slate-100 rounded-2xl text-center text-xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none transition-all">
-                <button onclick="checkPassword()" class="w-full h-14 bg-emerald-600 text-white rounded-2xl font-black text-lg shadow-lg">관리자 접속</button>
-                <button onclick="location.href='member/position.html'" class="w-full h-14 bg-white text-emerald-700 border-2 border-emerald-700 rounded-2xl font-black text-lg">전술판 바로가기</button>
+        <div class="scoreboard">
+            <div class="sb-header">
+                <div class="flex items-center"><span class="sb-dot">●</span><span class="sb-title">MATCH INFO</span></div>
+                <span id="sb-date-top" class="sb-date">...</span>
             </div>
+            <div class="sb-row"><div class="sb-label">장소</div><div class="sb-val" id="sb-loc">: -</div></div>
+            <div class="sb-row"><div class="sb-label">시간</div><div class="sb-val" id="sb-time">: -</div></div>
+            <div class="sb-row"><div class="sb-label">상대팀</div><div class="sb-val" id="sb-opp">: -</div></div>
+        </div>
 
-            <div id="display-area" class="hidden">
-                <div class="match-board">
-                    <div class="match-header">
-                        <div class="match-info-tag">MATCH INFO</div>
-                        <div id="view-date" class="text-xs font-bold text-slate-400"></div>
-                    </div>
-                    <div class="board-body">
-                        <div class="board-row"><span class="row-label">장소 :</span><span id="view-loc" class="row-value"></span></div>
-                        <div class="board-row"><span class="row-label">시간 :</span><span id="view-time" class="row-value"></span></div>
-                        <div class="board-row"><span class="row-label">상대팀 :</span><span id="view-opp" class="row-value"></span></div>
-                    </div>
-                </div>
-                <button onclick="toggleInput(true)" class="w-full mt-3 py-3 bg-slate-200 text-slate-500 rounded-xl font-bold text-sm">정보수정</button>
+        <button onclick="toggleEditPanel()" class="text-slate-500 text-xs font-bold underline mb-2">경기 정보 수정</button>
+        
+        <div id="edit-form-panel" class="hidden">
+            <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="ed-date" placeholder="날짜" class="edit-input">
+                <input type="text" id="ed-loc" placeholder="장소" class="edit-input">
+                <input type="text" id="ed-time" placeholder="시간" class="edit-input">
+                <input type="text" id="ed-opp" placeholder="상대팀" class="edit-input">
             </div>
-
-            <div id="input-area">
-                <div class="input-box-wrap">
-                    <h3 class="text-[10px] font-black text-slate-400 mb-3 uppercase">Match Schedule Edit</h3>
-                    <div class="input-row"><span class="label-text">날짜 :</span><input type="text" id="sched-date" class="input-el" placeholder="00.00 (요일)"></div>
-                    <div class="input-row"><span class="label-text">장소 :</span><input type="text" id="sched-loc" class="input-el"></div>
-                    <div class="input-row"><span class="label-text">시간 :</span><input type="text" id="sched-time" class="input-el"></div>
-                    <div class="input-row"><span class="label-text">상대팀 :</span><input type="text" id="sched-opp" class="input-el"></div>
-                    <button onclick="saveSchedule()" class="btn-confirm">확인</button>
-                </div>
-            </div>
+            <button onclick="updateSchedule()" class="w-full mt-2 py-2 bg-emerald-700 text-white text-[11px] rounded-lg font-bold">저장하기</button>
         </div>
     </section>
 
     <div id="main-app" class="hidden">
-        <header class="p-6 bg-white border-b sticky top-0 z-50">
-            <div class="flex justify-between items-end mb-6">
-                <div>
-                    <h2 class="text-2xl font-black text-slate-800">선수 명단</h2>
-                    <p class="text-emerald-600 font-bold text-xs">FC 수지사랑 관리자</p>
+        <header class="sticky top-0 z-50 bg-white/95 border-b p-4 shadow-sm">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-black text-emerald-600 italic">FC SUJI MANAGER</h2>
+                <div class="flex gap-1">
+                    <button onclick="addMember()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-black">추가</button>
+                    <button onclick="deleteMember()" class="bg-slate-800 text-white px-3 py-1.5 rounded-lg text-[10px] font-black">삭제</button>
                 </div>
-                <button onclick="addMember()" class="bg-slate-900 text-white px-5 py-2 rounded-xl text-xs font-black">+ 추가</button>
             </div>
-
-            <div id="q-wrap" class="grid grid-cols-4 gap-2 mb-4">
-                <button onclick="selectQ(1)" id="q1" class="q-btn h-12 border rounded-2xl font-black text-sm bg-slate-50 text-slate-400">1분기</button>
-                <button onclick="selectQ(2)" id="q2" class="q-btn h-12 border rounded-2xl font-black text-sm bg-slate-50 text-slate-400">2분기</button>
-                <button onclick="selectQ(3)" id="q3" class="q-btn h-12 border rounded-2xl font-black text-sm bg-slate-50 text-slate-400">3분기</button>
-                <button onclick="selectQ(4)" id="q4" class="q-btn h-12 border rounded-2xl font-black text-sm bg-slate-50 text-slate-400">4분기</button>
+            <div class="space-y-2">
+                <div class="grid grid-cols-4 gap-1.5" id="q-wrap">
+                    <button onclick="selectQ(1)" id="q1" class="filter-btn h-9">1분기</button>
+                    <button onclick="selectQ(2)" id="q2" class="filter-btn h-9">2분기</button>
+                    <button onclick="selectQ(3)" id="q3" class="filter-btn h-9">3분기</button>
+                    <button onclick="selectQ(4)" id="q4" class="filter-btn h-9">4분기</button>
+                </div>
+                <div id="m-wrap" class="grid grid-cols-3 gap-1.5"></div>
+                <div id="w-wrap" class="flex gap-2 overflow-x-auto pb-1 no-scrollbar"></div>
             </div>
-            <div id="m-wrap" class="flex gap-2 overflow-x-auto pb-2 mb-2 no-scrollbar"></div>
-            <div id="w-wrap" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar"></div>
         </header>
-        <main id="list-container" class="p-6 space-y-4"></main>
+        <main class="p-4">
+            <div id="view-title" class="text-[11px] font-bold text-slate-400 mb-4 px-1"></div>
+            <div id="list-container" class="space-y-3"></div>
+        </main>
     </div>
 
     <script>
@@ -136,124 +144,115 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        
+        let members = []; let pData = {}; let sched = {};
+        let selQ = 1, selM = 1, selW = 1;
 
-        let members = [];
-        let currentQ = 1, currentM = 1, currentW = 1;
+        db.ref('fc_suji_v9').on('value', (snap) => {
+            const data = snap.val() || {};
+            members = data.members || [];
+            pData = data.points || {};
+            sched = data.schedule || { date: '미정', loc: '미정', time: '미정', opp: '미정' };
+            updateScheduleUI();
+            render();
+        });
 
-        window.onload = function() {
-            db.ref('schedule').on('value', snap => {
-                const data = snap.val();
-                if(data) {
-                    renderSchedule(data);
-                    toggleInput(false);
-                } else {
-                    toggleInput(true);
-                }
-            });
-        };
-
-        function toggleInput(show) {
-            document.getElementById('input-area').style.display = show ? 'block' : 'none';
-            document.getElementById('display-area').classList.toggle('hidden', show);
-        }
-
-        function saveSchedule() {
-            const data = {
-                date: document.getElementById('sched-date').value,
-                loc: document.getElementById('sched-loc').value,
-                time: document.getElementById('sched-time').value,
-                opp: document.getElementById('sched-opp').value
-            };
-            if(!data.date || !data.opp) { alert("날짜와 상대팀은 필수입니다."); return; }
-            db.ref('schedule').set(data).then(() => { toggleInput(false); });
-        }
-
-        function renderSchedule(data) {
-            document.getElementById('view-date').innerText = data.date || '';
-            document.getElementById('view-loc').innerText = data.loc || '';
-            document.getElementById('view-time').innerText = data.time || '';
-            document.getElementById('view-opp').innerText = data.opp || '';
-            document.getElementById('sched-date').value = data.date || '';
-            document.getElementById('sched-loc').value = data.loc || '';
-            document.getElementById('sched-time').value = data.time || '';
-            document.getElementById('sched-opp').value = data.opp || '';
-        }
-
-        /* --- 관리자 접속 및 멤버 리스트 로드 로직 (수정됨) --- */
         function checkPassword() {
-            if(document.getElementById('pw-input').value === '2025') {
+            if(document.getElementById('pw-input').value === '2026') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-app').classList.remove('hidden');
-                initAdmin(); // 비밀번호 확인 후 멤버 리스트 로드 시작
-            } else { alert("비밀번호가 틀렸습니다."); }
+                selectQ(1);
+            } else {
+                const msg = document.getElementById('error-msg');
+                msg.style.opacity = '1';
+                setTimeout(() => msg.style.opacity = '0', 2000);
+            }
         }
 
-        function initAdmin() {
-            // fc_suji_v9 테이블에서 멤버 리스트를 실시간으로 가져옵니다.
-            db.ref('fc_suji_v9').on('value', snap => {
-                const val = snap.val();
-                members = val ? Object.keys(val).map(id => ({id, ...val[id]})) : [];
-                selectQ(1); // 초기 분기 선택 및 리스트 렌더링
+        function toggleEditPanel() {
+            const panel = document.getElementById('edit-form-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        function updateSchedule() {
+            const newSched = {
+                date: document.getElementById('ed-date').value || sched.date,
+                loc: document.getElementById('ed-loc').value || sched.loc,
+                time: document.getElementById('ed-time').value || sched.time,
+                opp: document.getElementById('ed-opp').value || sched.opp
+            };
+            db.ref('fc_suji_v9/schedule').set(newSched).then(() => {
+                alert('일정이 저장되었습니다.');
+                toggleEditPanel();
             });
         }
 
-        function selectQ(q) {
-            currentQ = q;
-            document.querySelectorAll('.q-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('q'+q).classList.add('active');
-            const months = { 1:[1,2,3], 2:[4,5,6], 3:[7,8,9], 4:[10,11,12] };
-            document.getElementById('m-wrap').innerHTML = months[q].map(m => `
-                <button onclick="selectM(${m})" id="m${m}" class="m-btn flex-none px-6 h-12 border rounded-2xl font-black text-sm bg-white text-slate-400">${m}월</button>
-            `).join('');
-            selectM(months[q][0]);
+        function updateScheduleUI() {
+            document.getElementById('sb-date-top').innerText = sched.date;
+            document.getElementById('sb-loc').innerText = ': ' + sched.loc;
+            document.getElementById('sb-time').innerText = ': ' + sched.time;
+            document.getElementById('sb-opp').innerText = ': ' + sched.opp;
         }
 
+        // 기존 포인트 로직 (유지)
+        function selectQ(q) {
+            selQ = q; updateBtnUI('q-wrap', `q${q}`);
+            const ms = q === 1 ? [1,2,3] : q === 2 ? [4,5,6] : q === 3 ? [7,8,9] : [10,11,12];
+            document.getElementById('m-wrap').innerHTML = ms.map(m => `<button onclick="selectM(${m})" id="m${m}" class="filter-btn h-9">${m}월</button>`).join('');
+            selectM(ms[0]);
+        }
         function selectM(m) {
-            currentM = m;
-            document.querySelectorAll('.m-btn').forEach(b => b.classList.remove('active'));
-            if(document.getElementById('m'+m)) document.getElementById('m'+m).classList.add('active');
-            document.getElementById('w-wrap').innerHTML = [1,2,3,4,5].map(w => `
-                <button onclick="selectW(${w})" id="w${w}" class="w-btn flex-none px-5 h-10 border rounded-xl font-black text-[11px] bg-white text-slate-300">${w}주차</button>
-            `).join('');
+            selM = m; updateBtnUI('m-wrap', `m${m}`);
+            document.getElementById('w-wrap').innerHTML = [1,2,3,4,5].map(w => `<button onclick="selectW(${w})" id="w${w}" class="filter-btn min-w-[60px] h-8 text-[11px]">${w}주차</button>`).join('');
             selectW(1);
         }
-
         function selectW(w) {
-            currentW = w;
-            document.querySelectorAll('.w-btn').forEach(b => b.classList.remove('active'));
-            if(document.getElementById('w'+w)) document.getElementById('w'+w).classList.add('active');
-            db.ref(`attendance/m${currentM}/w${currentW}`).on('value', snap => {
-                renderList(snap.val() || {});
-            });
+            selW = w; updateBtnUI('w-wrap', `w${w}`);
+            document.getElementById('view-title').innerText = `● 2026년 ${selQ}분기 ${selM}월 ${selW}주차 현황`;
+            render();
+        }
+        function updateBtnUI(pid, aid) {
+            document.querySelectorAll(`#${pid} button`).forEach(b => b.classList.toggle('active', b.id === aid));
         }
 
-        function renderList(attendance) {
-            const container = document.getElementById('list-container');
-            if (members.length === 0) {
-                container.innerHTML = '<p class="text-center text-slate-400 font-bold">멤버 데이터가 없습니다.</p>';
-                return;
+        function getCumScore(mid) {
+            let total = 0;
+            const ms = selQ === 1 ? [1,2,3] : selQ === 2 ? [4,5,6] : selQ === 3 ? [7,8,9] : [10,11,12];
+            for (let m of ms) {
+                if (m > selM) break;
+                for (let w = 1; w <= 5; w++) {
+                    if (m === selM && w > selW) break;
+                    const k = `${selQ}-${m}-${w}-${mid}`;
+                    if (pData[k]) total += (Number(pData[k].a) || 0) + (Number(pData[k].t) || 0);
+                }
             }
-            container.innerHTML = members.map(m => {
-                const cur = attendance[m.id] || { a: 0, t: 0 };
+            return total;
+        }
+
+        function render() {
+            const container = document.getElementById('list-container');
+            if(!container) return;
+            const sorted = [...members].sort((a,b) => getCumScore(b.id) - getCumScore(a.id));
+            container.innerHTML = sorted.map((m, i) => {
+                const cum = getCumScore(m.id);
+                const cur = pData[`${selQ}-${selM}-${selW}-${m.id}`] || {a:0, t:0};
+                const medal = cum >= 21 ? '🥇' : cum >= 11 ? '🥈' : '🥉';
                 return `
-                <div class="member-card">
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center font-black text-emerald-700 text-xl">${m.name[0]}</div>
+                <div class="bg-white p-4 rounded-2xl flex items-center justify-between shadow-sm border border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">${medal}</span>
                         <div>
-                            <div class="font-black text-slate-800 text-lg">${m.name}</div>
-                            <div class="text-[10px] font-black text-slate-300 uppercase">${m.pos || '선수'}</div>
+                            <div class="text-base font-black text-slate-800">${m.name}</div>
+                            <div class="text-[11px] font-bold text-indigo-600">${cum}P 누적</div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <button onclick="toggleAttend('${m.id}', ${cur.a})" class="w-20 h-14 rounded-2xl font-black text-[12px] transition-all ${cur.a === 3 ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}">
-                            ${cur.a === 3 ? '참 석' : '미 참'}
-                        </button>
-                        <div class="flex flex-col items-center gap-1 bg-emerald-50 p-2 rounded-2xl border border-emerald-100 min-w-[80px]">
-                            <span class="text-[9px] font-black text-emerald-600">훈련</span>
+                    <div class="flex gap-2">
+                        <button onclick="toggleAttend(${m.id})" class="w-14 h-12 rounded-xl font-black text-[11px] ${cur.a===3 ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400'}">참석</button>
+                        <div class="flex flex-col items-center bg-emerald-50 px-2 py-1 rounded-xl border border-emerald-100">
                             <div class="flex items-center gap-2">
-                                <button onclick="changeTrain('${m.id}', ${cur.t || 0}, -1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm font-bold text-emerald-400">-</button>
-                                <span class="w-4 text-center font-black text-emerald-700 text-sm">${cur.t || 0}</span>
-                                <button onclick="changeTrain('${m.id}', ${cur.t || 0}, 1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg shadow-sm font-bold text-emerald-600">+</button>
+                                <button onclick="changeTrain(${m.id},-1)" class="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm text-slate-400">-</button>
+                                <span class="text-xs font-black w-4 text-center">${cur.t || 0}</span>
+                                <button onclick="changeTrain(${m.id},1)" class="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm text-emerald-600">+</button>
                             </div>
                         </div>
                     </div>
@@ -261,20 +260,22 @@
             }).join('');
         }
 
-        function toggleAttend(id, current) {
-            const next = current === 3 ? 0 : 3;
-            db.ref(`attendance/m${currentM}/w${currentW}/${id}/a`).set(next);
+        function toggleAttend(mid) {
+            const k = `${selQ}-${selM}-${selW}-${mid}`;
+            if(!pData[k]) pData[k] = {a:0, t:0};
+            pData[k].a = (pData[k].a === 3) ? 0 : 3;
+            db.ref('fc_suji_v9/points').set(pData);
         }
-
-        function changeTrain(id, current, delta) {
-            const next = Math.max(0, current + delta);
-            db.ref(`attendance/m${currentM}/w${currentW}/${id}/t`).set(next);
+        function changeTrain(mid, v) {
+            const k = `${selQ}-${selM}-${selW}-${mid}`;
+            if(!pData[k]) pData[k] = {a:0, t:0};
+            if((pData[k].t || 0) + v >= 0) {
+                pData[k].t = (pData[k].t || 0) + v;
+                db.ref('fc_suji_v9/points').set(pData);
+            }
         }
-
-        function addMember() {
-            const name = prompt("새 선수 이름을 입력하세요:");
-            if(name) db.ref('fc_suji_v9').push({ name, pos: '선수' });
-        }
+        function addMember() { const n = prompt('이름:'); if(n) { members.push({id: Date.now(), name: n}); db.ref('fc_suji_v9/members').set(members); } }
+        function deleteMember() { const n = prompt('삭제할 이름:'); if(n) { members = members.filter(m => m.name !== n); db.ref('fc_suji_v9/members').set(members); } }
     </script>
 </body>
 </html>
