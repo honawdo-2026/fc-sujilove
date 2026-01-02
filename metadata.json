@@ -1,0 +1,7 @@
+{
+  "name": "FC Suji Love Point Manager",
+  "description": "A comprehensive soccer team management tool featuring attendance tracking, training point management, and an AI-powered match schedule analyzer.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
