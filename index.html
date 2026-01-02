@@ -24,7 +24,7 @@
 
         .login-card {
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px); padding: 40px 24px; border-radius: 32px;
+            backdrop-filter: blur(10px); padding: 30px 24px; border-radius: 32px;
             width: 90%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             text-align: center; z-index: 10;
         }
@@ -33,108 +33,51 @@
         .match-board {
             background-color: #0d141c;
             background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 5px 5px;
-            border: 4px solid #1e293b;
-            border-radius: 24px;
-            padding: 25px 20px;
-            color: #ffffff;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.5);
+            background-size: 5px 5px; border: 4px solid #1e293b; border-radius: 24px;
+            padding: 20px; color: #ffffff; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
         }
-
-        .match-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 10px;
-        }
-
-        .match-info-tag { color: #10b981; font-weight: 900; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .match-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .match-info-tag { color: #10b981; font-weight: 900; font-size: 12px; display: flex; align-items: center; gap: 6px; }
         .match-info-tag::before { content: ''; width: 8px; height: 8px; background: #ff4d4d; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #ff4d4d; }
+        .board-body { display: flex; flex-direction: column; gap: 10px; }
+        .board-row { display: flex; align-items: baseline; justify-content: flex-start; }
+        .row-label { font-size: 12px; font-weight: 700; color: #64748b; width: 60px; flex-shrink: 0; text-align: left; }
+        .row-value { flex-grow: 1; font-size: 20px; font-weight: 900; color: #ffffff; text-align: center; padding-right: 40px; }
 
-        .board-body { display: flex; flex-direction: column; gap: 15px; }
-        .board-row { 
-            display: flex; 
-            align-items: baseline; 
-            justify-content: flex-start;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 5px;
-        }
-        .row-label { font-size: 13px; font-weight: 700; color: #64748b; width: 65px; flex-shrink: 0; text-align: left; }
-        .row-value { flex-grow: 1; font-size: 22px; font-weight: 900; color: #ffffff; text-align: center; letter-spacing: -0.5px; padding-right: 40px; }
-        
-        /* 입력 폼 디자인 */
-        .input-box-wrap { background: #f8fafc; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; margin-top: 20px; text-align: left; }
-        .input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-        .label-text { width: 50px; font-size: 13px; font-weight: 800; color: #475569; }
-        .input-el { flex: 1; height: 42px; background: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 0 12px; font-size: 14px; outline: none; }
-        
-        .btn-confirm { background: #cbd5e1; color: #334155; padding: 10px 25px; border-radius: 10px; font-weight: 800; font-size: 14px; width: 100%; }
-        .btn-edit { background: #e2e8f0; color: #64748b; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 13px; width: 100%; margin-top: 15px; }
-
-        /* 멤버 리스트 스타일 (index.html 기반) */
+        /* 멤버 카드 및 버튼 스타일 */
         .member-card { background: white; border-radius: 24px; padding: 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .btn-text-spaced { letter-spacing: 0.2em; margin-right: -0.2em; }
+        .btn-text-spaced { letter-spacing: 0.1em; }
+        .q-btn.active { background-color: #059669 !important; color: white !important; }
+        .m-btn.active { background-color: #10b981 !important; color: white !important; border-color: #10b981 !important; }
+        .w-btn.active { background-color: #34d399 !important; color: white !important; border-color: #34d399 !important; }
     </style>
 </head>
 <body class="pb-32">
 
     <section id="login-screen">
         <div class="login-card">
-            <div class="mb-8">
+            <div class="mb-6">
                 <h1 class="text-2xl font-black text-emerald-800 italic tracking-tighter">FC SUJI SARANG</h1>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Management System</p>
             </div>
 
-            <div id="auth-area" class="space-y-3 mb-4">
+            <div id="auth-area" class="space-y-3 mb-6">
                 <input type="password" id="pw-input" inputmode="numeric" placeholder="접속 암호" class="w-full h-14 bg-slate-100 rounded-2xl text-center text-xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none">
                 <button onclick="checkPassword()" class="w-full h-14 bg-emerald-600 text-white rounded-2xl font-black text-lg shadow-lg">관리자 접속</button>
                 <button onclick="location.href='member/position.html'" class="w-full h-14 bg-white text-emerald-700 border-2 border-emerald-700 rounded-2xl font-black text-lg">전술판 바로가기</button>
             </div>
 
-            <div id="input-area">
-                <div class="input-box-wrap">
-                    <h3 class="text-[11px] font-black text-slate-400 mb-4 uppercase">Match Schedule Input</h3>
-                    <div class="input-row">
-                        <span class="label-text">날짜</span>
-                        <input type="text" id="sched-date" placeholder="예: 1월 4일" class="input-el">
-                    </div>
-                    <div class="input-row">
-                        <span class="label-text">장소</span>
-                        <input type="text" id="sched-loc" placeholder="장소" class="input-el">
-                    </div>
-                    <div class="input-row">
-                        <span class="label-text">시간</span>
-                        <input type="text" id="sched-time" placeholder="시간" class="input-el">
-                    </div>
-                    <div class="input-row">
-                        <span class="label-text">상대팀</span>
-                        <input type="text" id="sched-opp" placeholder="상대팀" class="input-el">
-                    </div>
-                    <button onclick="saveSchedule()" class="btn-confirm active:scale-95 transition-all">확인</button>
-                </div>
-            </div>
-
-            <div id="display-area" class="hidden mt-6">
+            <div id="display-area" class="hidden">
                 <div class="match-board">
                     <div class="match-header">
                         <div class="match-info-tag">MATCH INFO</div>
-                        <div id="view-date" class="text-sm font-bold text-slate-400"></div>
+                        <div id="view-date" class="text-xs font-bold text-slate-400"></div>
                     </div>
                     <div class="board-body">
-                        <div class="board-row">
-                            <span class="row-label">장소 :</span>
-                            <span id="view-loc" class="row-value"></span>
-                        </div>
-                        <div class="board-row">
-                            <span class="row-label">시간 :</span>
-                            <span id="view-time" class="row-value"></span>
-                        </div>
-                        <div class="board-row">
-                            <span class="row-label">상대팀 :</span>
-                            <span id="view-opp" class="row-value"></span>
-                        </div>
+                        <div class="board-row"><span class="row-label">장소 :</span><span id="view-loc" class="row-value"></span></div>
+                        <div class="board-row"><span class="row-label">시간 :</span><span id="view-time" class="row-value"></span></div>
+                        <div class="board-row"><span class="row-label">상대팀 :</span><span id="view-opp" class="row-value"></span></div>
                     </div>
                 </div>
-                <button onclick="showInputArea()" class="btn-edit active:scale-95 transition-all">정보 수정하기</button>
             </div>
         </div>
     </section>
@@ -142,16 +85,21 @@
     <div id="main-app" class="hidden">
         <header class="p-4 bg-white border-b sticky top-0 z-50">
             <div class="flex justify-between items-center mb-4">
-                <span class="font-black text-emerald-600">FC 수지사랑 관리자</span>
-                <button onclick="addMember()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-full text-xs font-bold">+ 추가</button>
+                <span class="font-black text-emerald-600 text-xl">FC 수지사랑 관리자</span>
+                <button onclick="addMember()" class="bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md">+ 선수추가</button>
             </div>
-            <div id="q-wrap" class="grid grid-cols-4 gap-2">
-                <button onclick="selectQ(1)" id="q1" class="h-10 border rounded-xl font-bold text-xs bg-emerald-600 text-white">1분기</button>
-                <button onclick="selectQ(2)" id="q2" class="h-10 border rounded-xl font-bold text-xs bg-slate-50">2분기</button>
-                <button onclick="selectQ(3)" id="q3" class="h-10 border rounded-xl font-bold text-xs bg-slate-50">3분기</button>
-                <button onclick="selectQ(4)" id="q4" class="h-10 border rounded-xl font-bold text-xs bg-slate-50">4분기</button>
+
+            <div id="q-wrap" class="grid grid-cols-4 gap-2 mb-3">
+                <button onclick="selectQ(1)" id="q1" class="q-btn h-10 border rounded-xl font-bold text-xs bg-slate-50">1분기</button>
+                <button onclick="selectQ(2)" id="q2" class="q-btn h-10 border rounded-xl font-bold text-xs bg-slate-50">2분기</button>
+                <button onclick="selectQ(3)" id="q3" class="q-btn h-10 border rounded-xl font-bold text-xs bg-slate-50">3분기</button>
+                <button onclick="selectQ(4)" id="q4" class="q-btn h-10 border rounded-xl font-bold text-xs bg-slate-50">4분기</button>
             </div>
+
+            <div id="m-wrap" class="flex gap-2 overflow-x-auto pb-2 mb-2 no-scrollbar"></div>
+            <div id="w-wrap" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar"></div>
         </header>
+
         <main id="list-container" class="p-5 space-y-4"></main>
     </div>
 
@@ -168,76 +116,108 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let currentQ = 1;
         let members = [];
-        let attendance = {};
+        let currentQ = 1, currentM = 1, currentW = 1;
 
         window.onload = function() {
-            // 전광판 데이터 리스너
-            db.ref('schedule').on('value', (snapshot) => {
-                const data = snapshot.val();
-                if(data) { showDisplayArea(data); } 
-                else { showInputArea(); }
+            // 전광판 데이터 실시간 수신
+            db.ref('schedule').on('value', snap => {
+                const data = snap.val();
+                if(data) {
+                    document.getElementById('view-date').innerText = data.date || '';
+                    document.getElementById('view-loc').innerText = data.loc || '';
+                    document.getElementById('view-time').innerText = data.time || '';
+                    document.getElementById('view-opp').innerText = data.opp || '';
+                    document.getElementById('display-area').classList.remove('hidden');
+                }
             });
-        }
+        };
 
-        // --- 관리자 접속 로직 (index.html 기능 이식) ---
         function checkPassword() {
             if(document.getElementById('pw-input').value === '2025') {
-                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
-                loadData(); // 데이터 로드 시작
+                selectQ(1); // 초기 로드
             } else { alert("비밀번호가 틀렸습니다."); }
         }
 
-        function loadData() {
-            db.ref('members').on('value', (snap) => {
+        // 분기 선택 -> 월 생성
+        function selectQ(q) {
+            currentQ = q;
+            document.querySelectorAll('.q-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('q'+q).classList.add('active');
+
+            const months = { 1:[1,2,3], 2:[4,5,6], 3:[7,8,9], 4:[10,11,12] };
+            const mWrap = document.getElementById('m-wrap');
+            mWrap.innerHTML = months[q].map(m => `
+                <button onclick="selectM(${m})" id="m${m}" class="m-btn flex-none px-5 h-10 border rounded-xl font-bold text-xs bg-white text-slate-400 border-slate-200">${m}월</button>
+            `).join('');
+            selectM(months[q][0]);
+        }
+
+        // 월 선택 -> 주차 생성
+        function selectM(m) {
+            currentM = m;
+            document.querySelectorAll('.m-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('m'+m).classList.add('active');
+
+            const wWrap = document.getElementById('w-wrap');
+            wWrap.innerHTML = [1,2,3,4,5].map(w => `
+                <button onclick="selectW(${w})" id="w${w}" class="w-btn flex-none px-4 h-9 border rounded-lg font-bold text-[11px] bg-white text-slate-400 border-slate-100">${w}주차</button>
+            `).join('');
+            selectW(1);
+        }
+
+        // 주차 선택 -> 데이터 로드 및 렌더링
+        function selectW(w) {
+            currentW = w;
+            document.querySelectorAll('.w-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('w'+w).classList.add('active');
+            loadAndRender();
+        }
+
+        function loadAndRender() {
+            db.ref('members').once('value', snap => {
                 const val = snap.val();
                 members = val ? Object.keys(val).map(id => ({id, ...val[id]})) : [];
-                db.ref(`attendance/q${currentQ}`).on('value', (aSnap) => {
-                    attendance = aSnap.val() || {};
-                    renderList();
+                
+                // 해당 월/주의 출석 데이터 가져오기
+                db.ref(`attendance/m${currentM}/w${currentW}`).on('value', aSnap => {
+                    const attendance = aSnap.val() || {};
+                    renderList(attendance);
                 });
             });
         }
 
-        function selectQ(q) {
-            currentQ = q;
-            document.querySelectorAll('#q-wrap button').forEach((btn, idx) => {
-                if(idx + 1 === q) {
-                    btn.classList.replace('bg-slate-50', 'bg-emerald-600');
-                    btn.classList.add('text-white');
-                } else {
-                    btn.classList.replace('bg-emerald-600', 'bg-slate-50');
-                    btn.classList.remove('text-white');
-                }
-            });
-            loadData();
-        }
-
-        function renderList() {
+        function renderList(attendance) {
             const container = document.getElementById('list-container');
+            if(members.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-slate-400 font-bold">등록된 선수가 없습니다.</div>`;
+                return;
+            }
+
             container.innerHTML = members.map(m => {
                 const cur = attendance[m.id] || { a: 0, t: 0 };
                 return `
                 <div class="member-card">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center font-black text-emerald-700 text-lg">${m.name[0]}</div>
+                        <button onclick="deleteMember('${m.id}', '${m.name}')" class="text-red-300 hover:text-red-500 text-xs">✕</button>
+                        <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center font-black text-emerald-700">${m.name[0]}</div>
                         <div>
-                            <div class="font-black text-slate-800 text-lg">${m.name}</div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${m.pos || '선수'}</div>
+                            <div class="font-black text-slate-800">${m.name}</div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase">${m.pos || '선수'}</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="toggleAttend('${m.id}', this)" class="w-16 h-14 rounded-2xl font-black text-[12px] transition-all ${cur.a === 3 ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}">
+                        <button onclick="toggleAttend('${m.id}', ${cur.a})" class="w-16 h-12 rounded-xl font-black text-[12px] transition-all ${cur.a === 3 ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}">
                             <span class="btn-text-spaced">${cur.a === 3 ? '참 석' : '미 참'}</span>
                         </button>
-                        <div class="flex flex-col items-center gap-1 bg-emerald-50 p-2 rounded-2xl border border-emerald-100 min-w-[70px]">
-                            <span class="text-[11px] font-black text-emerald-600 uppercase">훈 훈련</span>
+                        <div class="flex flex-col items-center gap-1 bg-emerald-50 p-2 rounded-xl border border-emerald-100 min-w-[70px]">
+                            <span class="text-[9px] font-black text-emerald-600 uppercase">훈련</span>
                             <div class="flex items-center gap-2">
-                                <button onclick="changeTrain('${m.id}',-1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg font-black text-emerald-400 shadow-sm">-</button>
-                                <span class="w-4 text-center font-black text-emerald-700 text-sm">${cur.t || 0}</span>
-                                <button onclick="changeTrain('${m.id}',1)" class="w-8 h-8 flex items-center justify-center bg-white rounded-lg font-black text-emerald-600 shadow-sm">+</button>
+                                <button onclick="changeTrain('${m.id}', ${cur.t || 0}, -1)" class="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm font-bold text-emerald-400">-</button>
+                                <span class="w-4 text-center font-black text-emerald-700 text-xs">${cur.t || 0}</span>
+                                <button onclick="changeTrain('${m.id}', ${cur.t || 0}, 1)" class="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm font-bold text-emerald-600">+</button>
                             </div>
                         </div>
                     </div>
@@ -245,48 +225,26 @@
             }).join('');
         }
 
-        // --- 포인트 관리 함수들 ---
-        function toggleAttend(id, btn) {
-            const cur = attendance[id] || { a: 0, t: 0 };
-            const nextA = cur.a === 3 ? 0 : 3;
-            db.ref(`attendance/q${currentQ}/${id}/a`).set(nextA);
+        // 기능 함수들
+        function toggleAttend(id, currentVal) {
+            const nextVal = currentVal === 3 ? 0 : 3;
+            db.ref(`attendance/m${currentM}/w${currentW}/${id}/a`).set(nextVal);
         }
 
-        function changeTrain(id, delta) {
-            const cur = attendance[id] || { a: 0, t: 0 };
-            const nextT = Math.max(0, (cur.t || 0) + delta);
-            db.ref(`attendance/q${currentQ}/${id}/t`).set(nextT);
+        function changeTrain(id, currentVal, delta) {
+            const nextVal = Math.max(0, currentVal + delta);
+            db.ref(`attendance/m${currentM}/w${currentW}/${id}/t`).set(nextVal);
         }
 
         function addMember() {
-            const name = prompt("새 멤버 이름을 입력하세요:");
+            const name = prompt("새 선수 이름을 입력하세요:");
             if(name) db.ref('members').push({ name, pos: '선수' });
         }
 
-        // --- 전광판 제어 함수들 ---
-        function showInputArea() {
-            document.getElementById('input-area').style.display = 'block';
-            document.getElementById('display-area').classList.add('hidden');
-        }
-
-        function showDisplayArea(data) {
-            document.getElementById('view-date').innerText = data.date || '';
-            document.getElementById('view-loc').innerText = data.loc || '';
-            document.getElementById('view-time').innerText = data.time || '';
-            document.getElementById('view-opp').innerText = data.opp || '';
-            document.getElementById('input-area').style.display = 'none';
-            document.getElementById('display-area').classList.remove('hidden');
-        }
-
-        function saveSchedule() {
-            const data = {
-                date: document.getElementById('sched-date').value,
-                loc: document.getElementById('sched-loc').value,
-                time: document.getElementById('sched-time').value,
-                opp: document.getElementById('sched-opp').value
-            };
-            if(!data.date || !data.opp) { alert("날짜와 상대팀을 입력해주세요."); return; }
-            db.ref('schedule').set(data);
+        function deleteMember(id, name) {
+            if(confirm(`[${name}] 선수를 삭제하시겠습니까?`)) {
+                db.ref(`members/${id}`).remove();
+            }
         }
     </script>
 </body>
