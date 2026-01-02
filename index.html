@@ -20,7 +20,7 @@
             position: fixed; inset: 0; z-index: 1000;
             background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
             display: flex; align-items: center; justify-content: center;
-            overflow-y: auto; padding: 20px 0;
+            overflow-y: auto;
         }
 
         .login-card {
@@ -52,14 +52,14 @@
         .label-text { width: 50px; font-size: 13px; font-weight: 800; color: #475569; }
         .input-el { flex: 1; height: 42px; background: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 0 12px; font-size: 14px; outline: none; }
         
-        .btn-confirm { background: #cbd5e1; color: #334155; padding: 10px 25px; border-radius: 10px; font-weight: 800; font-size: 14px; width: 100%; }
-        .btn-edit { background: #e2e8f0; color: #64748b; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 13px; width: 100%; margin-top: 10px; }
+        .btn-confirm { background: #10b981; color: white; padding: 12px; border-radius: 12px; font-weight: 800; width: 100%; margin-top: 5px; }
+        .btn-edit-trigger { background: #e2e8f0; color: #64748b; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 13px; width: 100%; margin-top: 10px; }
 
-        /* 멤버 카드 및 탭 스타일 */
+        /* 관리자 앱 스타일 */
         .member-card { background: white; border-radius: 24px; padding: 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .q-btn.active { background-color: #059669 !important; color: white !important; }
-        .m-btn.active { background-color: #10b981 !important; color: white !important; border-color: #10b981 !important; }
-        .w-btn.active { background-color: #34d399 !important; color: white !important; border-color: #34d399 !important; }
+        .q-btn.active { background-color: #065f46 !important; color: white !important; }
+        .m-btn.active { background-color: #10b981 !important; color: white !important; }
+        .w-btn.active { background-color: #34d399 !important; color: white !important; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -68,16 +68,16 @@
     <section id="login-screen">
         <div class="login-card">
             <div class="mb-6">
-                <h1 class="text-2xl font-black text-emerald-800 italic tracking-tighter">FC SUJI SARANG</h1>
+                <h1 class="text-2xl font-black text-emerald-800 italic italic tracking-tighter">FC SUJI SARANG</h1>
             </div>
 
             <div id="auth-area" class="space-y-3 mb-6">
-                <input type="password" id="pw-input" inputmode="numeric" placeholder="접속 암호" class="w-full h-14 bg-slate-100 rounded-2xl text-center text-xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none">
+                <input type="password" id="pw-input" inputmode="numeric" placeholder="접속 암호" class="w-full h-14 bg-slate-100 rounded-2xl text-center text-xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none transition-all">
                 <button onclick="checkPassword()" class="w-full h-14 bg-emerald-600 text-white rounded-2xl font-black text-lg shadow-lg">관리자 접속</button>
                 <button onclick="location.href='member/position.html'" class="w-full h-14 bg-white text-emerald-700 border-2 border-emerald-700 rounded-2xl font-black text-lg">전술판 바로가기</button>
             </div>
 
-            <div id="display-area" class="hidden">
+            <div id="display-area">
                 <div class="match-board">
                     <div class="match-header">
                         <div class="match-info-tag">MATCH INFO</div>
@@ -89,17 +89,17 @@
                         <div class="board-row"><span class="row-label">상대팀 :</span><span id="view-opp" class="row-value"></span></div>
                     </div>
                 </div>
-                <button onclick="showInputArea()" class="btn-edit active:scale-95 transition-all">정보 수정하기</button>
+                <button onclick="toggleInputArea()" class="btn-edit-trigger">정보 수정하기</button>
             </div>
 
             <div id="input-area" class="hidden">
                 <div class="input-box-wrap">
-                    <h3 class="text-[11px] font-black text-slate-400 mb-4 uppercase">Match Schedule Input</h3>
-                    <div class="input-row"><span class="label-text">날짜</span><input type="text" id="sched-date" placeholder="예: 1월 4일" class="input-el"></div>
-                    <div class="input-row"><span class="label-text">장소</span><input type="text" id="sched-loc" placeholder="장소" class="input-el"></div>
-                    <div class="input-row"><span class="label-text">시간</span><input type="text" id="sched-time" placeholder="시간" class="input-el"></div>
-                    <div class="input-row"><span class="label-text">상대팀</span><input type="text" id="sched-opp" placeholder="상대팀" class="input-el"></div>
-                    <button onclick="saveSchedule()" class="btn-confirm active:scale-95 transition-all">확인</button>
+                    <h3 class="text-[11px] font-black text-slate-400 mb-4 uppercase">Match Info Edit</h3>
+                    <div class="input-row"><span class="label-text">날짜</span><input type="text" id="sched-date" class="input-el"></div>
+                    <div class="input-row"><span class="label-text">장소</span><input type="text" id="sched-loc" class="input-el"></div>
+                    <div class="input-row"><span class="label-text">시간</span><input type="text" id="sched-time" class="input-el"></div>
+                    <div class="input-row"><span class="label-text">상대팀</span><input type="text" id="sched-opp" class="input-el"></div>
+                    <button onclick="saveSchedule()" class="btn-confirm">저장하기</button>
                 </div>
             </div>
         </div>
@@ -127,6 +127,7 @@
     </div>
 
     <script>
+        // 파이어베이스 설정
         const firebaseConfig = {
             apiKey: "AIzaSyAVvQNQaLlxu9Bp_vVGKNzkdN5QRN8n8-Y",
             authDomain: "fc-sujilove.firebaseapp.com",
@@ -142,8 +143,8 @@
         let members = [];
         let currentQ = 1, currentM = 1, currentW = 1;
 
+        // 초기 데이터 수신 (전광판)
         window.onload = function() {
-            // 전광판 초기 데이터 로드
             db.ref('schedule').on('value', snap => {
                 const data = snap.val();
                 if(data) {
@@ -151,27 +152,28 @@
                     document.getElementById('view-loc').innerText = data.loc || '';
                     document.getElementById('view-time').innerText = data.time || '';
                     document.getElementById('view-opp').innerText = data.opp || '';
-                    document.getElementById('display-area').classList.remove('hidden');
-                    document.getElementById('input-area').classList.add('hidden');
-                } else {
-                    showInputArea();
+                    // 입력창에도 데이터 미리 채워넣기
+                    document.getElementById('sched-date').value = data.date || '';
+                    document.getElementById('sched-loc').value = data.loc || '';
+                    document.getElementById('sched-time').value = data.time || '';
+                    document.getElementById('sched-opp').value = data.opp || '';
                 }
             });
         };
 
-        // 1. 관리자 접속 로직
+        // 관리자 로그인 함수
         function checkPassword() {
             const pw = document.getElementById('pw-input').value;
             if(pw === '2025') {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
-                selectQ(1); // 1분기부터 로드
+                selectQ(1); // 첫 분기 로드
             } else {
                 alert("비밀번호가 틀렸습니다.");
             }
         }
 
-        // 2. 분기/월/주 선택 로직 (index.html에서 이식)
+        // --- 관리자 필터 로직 ---
         function selectQ(q) {
             currentQ = q;
             document.querySelectorAll('.q-btn').forEach(b => b.classList.remove('active'));
@@ -180,7 +182,7 @@
             const months = { 1:[1,2,3], 2:[4,5,6], 3:[7,8,9], 4:[10,11,12] };
             const mWrap = document.getElementById('m-wrap');
             mWrap.innerHTML = months[q].map(m => `
-                <button onclick="selectM(${m})" id="m${m}" class="m-btn flex-none px-5 h-10 border rounded-xl font-bold text-xs bg-white border-slate-200">${m}월</button>
+                <button onclick="selectM(${m})" id="m${m}" class="m-btn flex-none px-5 h-10 border rounded-xl font-bold text-xs bg-white">${m}월</button>
             `).join('');
             selectM(months[q][0]);
         }
@@ -192,7 +194,7 @@
 
             const wWrap = document.getElementById('w-wrap');
             wWrap.innerHTML = [1,2,3,4,5].map(w => `
-                <button onclick="selectW(${w})" id="w${w}" class="w-btn flex-none px-4 h-9 border rounded-lg font-bold text-[11px] bg-white border-slate-100">${w}주차</button>
+                <button onclick="selectW(${w})" id="w${w}" class="w-btn flex-none px-4 h-9 border rounded-lg font-bold text-[11px] bg-white">${w}주차</button>
             `).join('');
             selectW(1);
         }
@@ -201,65 +203,62 @@
             currentW = w;
             document.querySelectorAll('.w-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('w'+w).classList.add('active');
-            loadAttendanceData();
+            loadAndRender();
         }
 
-        // 3. 데이터 로드 및 렌더링
-        function loadAttendanceData() {
+        // --- 데이터 로딩 및 렌더링 ---
+        function loadAndRender() {
             db.ref('members').once('value', snap => {
                 const val = snap.val();
                 members = val ? Object.keys(val).map(id => ({id, ...val[id]})) : [];
                 
                 db.ref(`attendance/m${currentM}/w${currentW}`).on('value', aSnap => {
                     const attendance = aSnap.val() || {};
-                    renderMemberList(attendance);
+                    const container = document.getElementById('list-container');
+                    
+                    if(members.length === 0) {
+                        container.innerHTML = `<div class="text-center py-10 text-slate-400 font-bold">등록된 선수가 없습니다.</div>`;
+                        return;
+                    }
+
+                    container.innerHTML = members.map(m => {
+                        const cur = attendance[m.id] || { a: 0, t: 0 };
+                        return `
+                        <div class="member-card">
+                            <div class="flex items-center gap-3">
+                                <button onclick="deleteMember('${m.id}', '${m.name}')" class="text-red-300 hover:text-red-500 text-xs">✕</button>
+                                <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center font-black text-emerald-700">${m.name[0]}</div>
+                                <div>
+                                    <div class="font-black text-slate-800">${m.name}</div>
+                                    <div class="text-[10px] font-bold text-slate-400 uppercase">${m.pos || '선수'}</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="updateAttend('${m.id}', ${cur.a})" class="w-16 h-12 rounded-xl font-black text-[12px] transition-all ${cur.a === 3 ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}">
+                                    참 석
+                                </button>
+                                <div class="flex flex-col items-center gap-1 bg-emerald-50 p-2 rounded-xl border border-emerald-100 min-w-[70px]">
+                                    <span class="text-[9px] font-black text-emerald-600 uppercase">훈련</span>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="updateTrain('${m.id}', ${cur.t || 0}, -1)" class="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm font-bold text-emerald-400">-</button>
+                                        <span class="w-4 text-center font-black text-emerald-700 text-xs">${cur.t || 0}</span>
+                                        <button onclick="updateTrain('${m.id}', ${cur.t || 0}, 1)" class="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm font-bold text-emerald-600">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    }).join('');
                 });
             });
         }
 
-        function renderMemberList(attendance) {
-            const container = document.getElementById('list-container');
-            if(members.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-slate-400 font-bold">등록된 선수가 없습니다.</div>`;
-                return;
-            }
-
-            container.innerHTML = members.map(m => {
-                const cur = attendance[m.id] || { a: 0, t: 0 };
-                return `
-                <div class="member-card">
-                    <div class="flex items-center gap-3">
-                        <button onclick="deleteMember('${m.id}', '${m.name}')" class="text-red-300 hover:text-red-500 text-xs">✕</button>
-                        <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center font-black text-emerald-700">${m.name[0]}</div>
-                        <div>
-                            <div class="font-black text-slate-800">${m.name}</div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase">${m.pos || '선수'}</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="toggleAttend('${m.id}', ${cur.a})" class="w-16 h-12 rounded-xl font-black text-[12px] transition-all ${cur.a === 3 ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}">
-                            참 석
-                        </button>
-                        <div class="flex flex-col items-center gap-1 bg-emerald-50 p-2 rounded-xl border border-emerald-100 min-w-[70px]">
-                            <span class="text-[9px] font-black text-emerald-600 uppercase">훈련</span>
-                            <div class="flex items-center gap-2">
-                                <button onclick="changeTrain('${m.id}', ${cur.t || 0}, -1)" class="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm font-bold text-emerald-400">-</button>
-                                <span class="w-4 text-center font-black text-emerald-700 text-xs">${cur.t || 0}</span>
-                                <button onclick="changeTrain('${m.id}', ${cur.t || 0}, 1)" class="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm font-bold text-emerald-600">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        // 4. 포인트 및 선수 관리 함수
-        function toggleAttend(id, currentVal) {
+        // --- 포인트 관리 함수 ---
+        function updateAttend(id, currentVal) {
             const nextVal = currentVal === 3 ? 0 : 3;
             db.ref(`attendance/m${currentM}/w${currentW}/${id}/a`).set(nextVal);
         }
 
-        function changeTrain(id, currentVal, delta) {
+        function updateTrain(id, currentVal, delta) {
             const nextVal = Math.max(0, currentVal + delta);
             db.ref(`attendance/m${currentM}/w${currentW}/${id}/t`).set(nextVal);
         }
@@ -275,10 +274,10 @@
             }
         }
 
-        // 5. 전광판 정보 수정 관련
-        function showInputArea() {
-            document.getElementById('display-area').classList.add('hidden');
-            document.getElementById('input-area').classList.remove('hidden');
+        // --- 전광판 관리 함수 ---
+        function toggleInputArea() {
+            const inputArea = document.getElementById('input-area');
+            inputArea.classList.toggle('hidden');
         }
 
         function saveSchedule() {
@@ -291,6 +290,7 @@
             if(!data.date || !data.opp) { alert("날짜와 상대팀은 필수입니다."); return; }
             db.ref('schedule').set(data).then(() => {
                 alert("정보가 수정되었습니다.");
+                document.getElementById('input-area').classList.add('hidden');
             });
         }
     </script>
