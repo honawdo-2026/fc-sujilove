@@ -20,7 +20,6 @@
             position: fixed; inset: 0; z-index: 1000;
             background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
             display: flex; align-items: center; justify-content: center;
-            overflow-y: auto; padding: 20px 0;
         }
 
         .login-card {
@@ -30,7 +29,7 @@
             text-align: center;
         }
 
-        /* 전광판 디자인 */
+        /* 전광판 */
         .match-board {
             background-color: #0d141c;
             background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
@@ -48,15 +47,18 @@
 
         .btn-edit-trigger { background: #e2e8f0; color: #64748b; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 13px; width: 100%; margin-top: 10px; }
 
-        /* 입력 폼 디자인 */
+        /* 입력 폼 */
         .input-box-wrap { background: #f8fafc; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; margin-top: 20px; text-align: left; }
         .input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
         .label-text { width: 50px; font-size: 13px; font-weight: 800; color: #475569; }
         .input-el { flex: 1; height: 42px; background: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 0 12px; font-size: 14px; outline: none; }
         .btn-confirm { background: #10b981; color: white; padding: 12px; border-radius: 12px; font-weight: 800; width: 100%; }
 
-        /* 관리자 앱 스타일 */
-        .member-card { background: white; border-radius: 24px; padding: 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        /* 멤버 카드 및 포인트 디자인 */
+        .member-card { background: white; border-radius: 24px; padding: 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .point-badge { background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 900; margin-top: 2px; display: inline-block; }
+        .medal-icon { font-size: 18px; margin-right: 4px; }
+        
         .q-btn.active { background-color: #065f46 !important; color: white !important; }
         .m-btn.active { background-color: #10b981 !important; color: white !important; border-color: #10b981 !important; }
         .w-btn.active { background-color: #34d399 !important; color: white !important; border-color: #34d399 !important; }
@@ -127,7 +129,6 @@
     </div>
 
     <script>
-        // 파이어베이스 설정 (기존과 동일)
         const firebaseConfig = {
             apiKey: "AIzaSyAVvQNQaLlxu9Bp_vVGKNzkdN5QRN8n8-Y",
             authDomain: "fc-sujilove.firebaseapp.com",
@@ -143,7 +144,6 @@
         let members = [];
         let currentQ = 1, currentM = 1, currentW = 1;
 
-        // 1. 초기 실행 및 전광판 데이터 수신
         window.onload = function() {
             db.ref('schedule').on('value', snap => {
                 const data = snap.val();
@@ -160,29 +160,24 @@
             });
         };
 
-        // 2. 관리자 비밀번호 확인 및 로그인
         function checkPassword() {
             const pw = document.getElementById('pw-input').value;
             if(pw === '2025') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-app').classList.remove('hidden');
-                initAdmin(); // 로그인 성공 시 데이터 초기화 호출
-            } else {
-                alert("비밀번호가 틀렸습니다.");
-            }
+                initAdmin();
+            } else { alert("비밀번호가 틀렸습니다."); }
         }
 
-        // 3. 관리자 화면 초기화
         function initAdmin() {
-            // 멤버 목록 실시간 감시 시작
-            db.ref('members').on('value', snap => {
+            // 선수 테이블 fc_suji_v9 사용
+            db.ref('fc_suji_v9').on('value', snap => {
                 const val = snap.val();
                 members = val ? Object.keys(val).map(id => ({id, ...val[id]})) : [];
-                selectQ(1); // 멤버가 로드되면 1분기를 자동으로 클릭
+                selectQ(1);
             });
         }
 
-        // 4. 필터링 로직 (분기 > 월 > 주차)
         function selectQ(q) {
             currentQ = q;
             document.querySelectorAll('.q-btn').forEach(b => b.classList.remove('active'));
@@ -213,13 +208,13 @@
             document.querySelectorAll('.w-btn').forEach(b => b.classList.remove('active'));
             if(document.getElementById('w'+w)) document.getElementById('w'+w).classList.add('active');
             
-            // 주차까지 선택되면 해당 주차의 출석 데이터를 리스닝하여 렌더링
+            // 데이터 수신 및 포인트 합산 정렬 로직
             db.ref(`attendance/m${currentM}/w${currentW}`).on('value', aSnap => {
-                renderList(aSnap.val() || {});
+                const attendance = aSnap.val() || {};
+                renderList(attendance);
             });
         }
 
-        // 5. 멤버 리스트 출력
         function renderList(attendance) {
             const container = document.getElementById('list-container');
             if(members.length === 0) {
@@ -227,28 +222,48 @@
                 return;
             }
 
-            container.innerHTML = members.map(m => {
+            // 포인트 계산 및 가공
+            let list = members.map(m => {
                 const cur = attendance[m.id] || { a: 0, t: 0 };
+                const totalPoint = (cur.a || 0) + (cur.t || 0); // a는 참석(3), t는 훈련(1씩 증가)
+                return { ...m, ...cur, totalPoint };
+            });
+
+            // 포인트 순으로 정렬 (내림차순)
+            list.sort((a, b) => b.totalPoint - a.totalPoint);
+
+            container.innerHTML = list.map((m, index) => {
+                // 메달 결정 (1, 2, 3위)
+                let medal = "";
+                if(m.totalPoint > 0) {
+                    if(index === 0) medal = '<span class="medal-icon">🥇</span>';
+                    else if(index === 1) medal = '<span class="medal-icon">🥈</span>';
+                    else if(index === 2) medal = '<span class="medal-icon">🥉</span>';
+                }
+
                 return `
                 <div class="member-card">
                     <div class="flex items-center gap-3">
-                        <button onclick="deleteMember('${m.id}', '${m.name}')" class="text-red-300 hover:text-red-500 text-xs">✕</button>
-                        <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center font-black text-emerald-700">${m.name[0]}</div>
+                        <button onclick="deleteMember('${m.id}', '${m.name}')" class="text-red-300 hover:text-red-400 text-xs">✕</button>
+                        <div class="flex flex-col items-center">
+                            ${medal}
+                            <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center font-black text-emerald-700">${m.name[0]}</div>
+                        </div>
                         <div>
                             <div class="font-black text-slate-800">${m.name}</div>
-                            <div class="text-[10px] font-bold text-slate-400 uppercase">${m.pos || '선수'}</div>
+                            <div class="point-badge">POINT: ${m.totalPoint}</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="toggleAttend('${m.id}', ${cur.a})" class="w-16 h-12 rounded-xl font-black text-[12px] transition-all ${cur.a === 3 ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}">
-                            참 석
+                        <button onclick="toggleAttend('${m.id}', ${m.a || 0})" class="w-16 h-12 rounded-xl font-black text-[12px] transition-all ${m.a === 3 ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400'}">
+                            ${m.a === 3 ? '참 석' : '미 참'}
                         </button>
-                        <div class="flex flex-col items-center gap-1 bg-emerald-50 p-2 rounded-xl border border-emerald-100 min-w-[70px]">
-                            <span class="text-[9px] font-black text-emerald-600 uppercase">훈련</span>
+                        <div class="flex flex-col items-center gap-1 bg-emerald-50 p-2 rounded-xl border border-emerald-100 min-w-[75px]">
+                            <span class="text-[9px] font-black text-emerald-600 uppercase">훈련 (+1)</span>
                             <div class="flex items-center gap-2">
-                                <button onclick="changeTrain('${m.id}', ${cur.t || 0}, -1)" class="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm font-bold text-emerald-400">-</button>
-                                <span class="w-4 text-center font-black text-emerald-700 text-xs">${cur.t || 0}</span>
-                                <button onclick="changeTrain('${m.id}', ${cur.t || 0}, 1)" class="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm font-bold text-emerald-600">+</button>
+                                <button onclick="changeTrain('${m.id}', ${m.t || 0}, -1)" class="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm font-bold text-emerald-400">-</button>
+                                <span class="w-4 text-center font-black text-emerald-700 text-xs">${m.t || 0}</span>
+                                <button onclick="changeTrain('${m.id}', ${m.t || 0}, 1)" class="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm font-bold text-emerald-600">+</button>
                             </div>
                         </div>
                     </div>
@@ -256,7 +271,7 @@
             }).join('');
         }
 
-        // --- 기타 기능 함수들 ---
+        // --- 포인트 업데이트 함수 (index.html 로직) ---
         function toggleAttend(id, currentVal) {
             const nextVal = currentVal === 3 ? 0 : 3;
             db.ref(`attendance/m${currentM}/w${currentW}/${id}/a`).set(nextVal);
@@ -269,12 +284,12 @@
 
         function addMember() {
             const name = prompt("새 선수 이름을 입력하세요:");
-            if(name) db.ref('members').push({ name, pos: '선수' });
+            if(name) db.ref('fc_suji_v9').push({ name, pos: '선수' });
         }
 
         function deleteMember(id, name) {
             if(confirm(`[${name}] 선수를 삭제하시겠습니까?`)) {
-                db.ref(`members/${id}`).remove();
+                db.ref(`fc_suji_v9/${id}`).remove();
             }
         }
 
