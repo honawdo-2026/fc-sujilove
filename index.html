@@ -31,78 +31,50 @@
 
         /* 전광판 */
         .match-board {
-            background-color: #0d141c;
-            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 5px 5px; border: 4px solid #1e293b; border-radius: 24px;
-            padding: 20px; color: #ffffff; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-            margin-bottom: 15px;
+            background-color: #0d141c; padding: 20px; border-radius: 24px; color: #ffffff;
+            border: 4px solid #1e293b; margin-bottom: 15px;
         }
-        .match-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        .match-info-tag { color: #10b981; font-weight: 900; font-size: 12px; display: flex; align-items: center; gap: 6px; }
-        .match-info-tag::before { content: ''; width: 8px; height: 8px; background: #ff4d4d; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #ff4d4d; }
-        .board-body { display: flex; flex-direction: column; gap: 10px; }
-        .board-row { display: flex; align-items: baseline; justify-content: flex-start; }
-        .row-label { font-size: 12px; font-weight: 700; color: #64748b; width: 60px; flex-shrink: 0; text-align: left; }
-        .row-value { flex-grow: 1; font-size: 20px; font-weight: 900; color: #ffffff; text-align: center; padding-right: 40px; }
+        .board-row { display: flex; align-items: baseline; margin-bottom: 5px; }
+        .row-label { font-size: 12px; color: #64748b; width: 60px; }
+        .row-value { font-size: 18px; font-weight: 900; flex-grow: 1; text-align: center; }
 
-        .btn-edit-trigger { background: #e2e8f0; color: #64748b; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 13px; width: 100%; margin-top: 10px; }
+        /* 멤버 카드 및 메달 */
+        .member-card { background: white; border-radius: 24px; padding: 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .medal-icon { font-size: 20px; margin-right: 5px; }
+        .point-badge { background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 900; margin-top: 2px; }
 
-        /* 입력 폼 */
-        .input-box-wrap { background: #f8fafc; padding: 20px; border-radius: 20px; border: 1px solid #e2e8f0; margin-top: 20px; text-align: left; }
-        .input-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-        .label-text { width: 50px; font-size: 13px; font-weight: 800; color: #475569; }
-        .input-el { flex: 1; height: 42px; background: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 0 12px; font-size: 14px; outline: none; }
-        .btn-confirm { background: #10b981; color: white; padding: 12px; border-radius: 12px; font-weight: 800; width: 100%; }
-
-        /* 멤버 카드 및 포인트 디자인 */
-        .member-card { background: white; border-radius: 24px; padding: 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
-        .point-badge { background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 900; margin-top: 2px; display: inline-block; }
-        .medal-icon { font-size: 18px; margin-right: 4px; }
-        
+        /* 탭 스타일 */
         .q-btn.active { background-color: #065f46 !important; color: white !important; }
-        .m-btn.active { background-color: #10b981 !important; color: white !important; border-color: #10b981 !important; }
-        .w-btn.active { background-color: #34d399 !important; color: white !important; border-color: #34d399 !important; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .m-btn.active { background-color: #10b981 !important; color: white !important; }
+        .w-btn.active { background-color: #34d399 !important; color: white !important; }
+        
+        .delete-btn { display: none; }
+        .delete-mode .delete-btn { display: block; }
     </style>
 </head>
 <body class="pb-32">
 
     <section id="login-screen">
         <div class="login-card">
-            <div class="mb-6">
-                <h1 class="text-2xl font-black text-emerald-800 italic tracking-tighter">FC SUJI SARANG</h1>
-            </div>
-
-            <div id="auth-area" class="space-y-3 mb-6">
+            <h1 class="text-2xl font-black text-emerald-800 mb-6 italic">FC SUJI SARANG</h1>
+            <div class="space-y-3 mb-6">
                 <input type="password" id="pw-input" inputmode="numeric" placeholder="접속 암호" class="w-full h-14 bg-slate-100 rounded-2xl text-center text-xl font-bold border-2 border-transparent focus:border-emerald-500 outline-none">
-                <button onclick="checkPassword()" class="w-full h-14 bg-emerald-600 text-white rounded-2xl font-black text-lg shadow-lg">관리자 접속</button>
-                <button onclick="location.href='member/position.html'" class="w-full h-14 bg-white text-emerald-700 border-2 border-emerald-700 rounded-2xl font-black text-lg">전술판 바로가기</button>
+                <button onclick="checkPassword()" class="w-full h-14 bg-emerald-600 text-white rounded-2xl font-black text-lg">관리자 접속</button>
             </div>
-
             <div id="display-area">
                 <div class="match-board">
-                    <div class="match-header">
-                        <div class="match-info-tag">MATCH INFO</div>
-                        <div id="view-date" class="text-xs font-bold text-slate-400"></div>
-                    </div>
-                    <div class="board-body">
-                        <div class="board-row"><span class="row-label">장소 :</span><span id="view-loc" class="row-value"></span></div>
-                        <div class="board-row"><span class="row-label">시간 :</span><span id="view-time" class="row-value"></span></div>
-                        <div class="board-row"><span class="row-label">상대팀 :</span><span id="view-opp" class="row-value"></span></div>
-                    </div>
+                    <div class="board-row"><span class="row-label">장소 :</span><span id="view-loc" class="row-value">-</span></div>
+                    <div class="board-row"><span class="row-label">시간 :</span><span id="view-time" class="row-value">-</span></div>
+                    <div class="board-row"><span class="row-label">상대 :</span><span id="view-opp" class="row-value">-</span></div>
                 </div>
-                <button onclick="toggleInputArea()" class="btn-edit-trigger">정보 수정하기</button>
+                <button onclick="toggleInputArea()" class="w-full py-3 bg-slate-200 rounded-xl text-sm font-bold text-slate-500">정보 수정하기</button>
             </div>
-
-            <div id="input-area" class="hidden">
-                <div class="input-box-wrap">
-                    <h3 class="text-[11px] font-black text-slate-400 mb-4 uppercase">Match Info Edit</h3>
-                    <div class="input-row"><span class="label-text">날짜</span><input type="text" id="sched-date" class="input-el"></div>
-                    <div class="input-row"><span class="label-text">장소</span><input type="text" id="sched-loc" class="input-el"></div>
-                    <div class="input-row"><span class="label-text">시간</span><input type="text" id="sched-time" class="input-el"></div>
-                    <div class="input-row"><span class="label-text">상대팀</span><input type="text" id="sched-opp" class="input-el"></div>
-                    <button onclick="saveSchedule()" class="btn-confirm">저장하기</button>
-                </div>
+            <div id="input-area" class="hidden mt-4 text-left p-4 bg-white rounded-2xl border">
+                <input type="text" id="sched-date" placeholder="날짜" class="w-full border p-2 mb-2 rounded">
+                <input type="text" id="sched-loc" placeholder="장소" class="w-full border p-2 mb-2 rounded">
+                <input type="text" id="sched-time" placeholder="시간" class="w-full border p-2 mb-2 rounded">
+                <input type="text" id="sched-opp" placeholder="상대팀" class="w-full border p-2 mb-2 rounded">
+                <button onclick="saveSchedule()" class="w-full py-3 bg-emerald-500 text-white rounded-xl font-bold">저장</button>
             </div>
         </div>
     </section>
@@ -110,19 +82,20 @@
     <div id="main-app" class="hidden">
         <header class="p-4 bg-white border-b sticky top-0 z-50">
             <div class="flex justify-between items-center mb-4">
-                <span class="font-black text-emerald-600 text-xl">FC 수지사랑 관리자</span>
-                <button onclick="addMember()" class="bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md">+ 선수추가</button>
+                <span class="font-black text-emerald-600 text-xl">관리자 모드</span>
+                <div class="flex gap-2">
+                    <button onclick="toggleDeleteMode()" class="bg-slate-100 text-slate-500 px-3 py-2 rounded-full text-xs font-bold">선수삭제</button>
+                    <button onclick="addMember()" class="bg-emerald-600 text-white px-3 py-2 rounded-full text-xs font-bold">+ 선수추가</button>
+                </div>
             </div>
-
-            <div id="q-wrap" class="grid grid-cols-4 gap-2 mb-3">
-                <button onclick="selectQ(1)" id="q1" class="q-btn h-10 border rounded-xl font-bold text-xs bg-slate-50">1분기</button>
-                <button onclick="selectQ(2)" id="q2" class="q-btn h-10 border rounded-xl font-bold text-xs bg-slate-50">2분기</button>
-                <button onclick="selectQ(3)" id="q3" class="q-btn h-10 border rounded-xl font-bold text-xs bg-slate-50">3분기</button>
-                <button onclick="selectQ(4)" id="q4" class="q-btn h-10 border rounded-xl font-bold text-xs bg-slate-50">4분기</button>
+            <div id="q-wrap" class="grid grid-cols-4 gap-2 mb-2">
+                <button onclick="selectQ(1)" id="q1" class="q-btn h-10 border rounded-xl font-bold text-xs">1분기</button>
+                <button onclick="selectQ(2)" id="q2" class="q-btn h-10 border rounded-xl font-bold text-xs">2분기</button>
+                <button onclick="selectQ(3)" id="q3" class="q-btn h-10 border rounded-xl font-bold text-xs">3분기</button>
+                <button onclick="selectQ(4)" id="q4" class="q-btn h-10 border rounded-xl font-bold text-xs">4분기</button>
             </div>
-
-            <div id="m-wrap" class="flex gap-2 overflow-x-auto pb-2 mb-2 no-scrollbar"></div>
-            <div id="w-wrap" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar"></div>
+            <div id="m-wrap" class="flex gap-2 overflow-x-auto pb-2 mb-2"></div>
+            <div id="w-wrap" class="flex gap-2 overflow-x-auto pb-2"></div>
         </header>
 
         <main id="list-container" class="p-5 space-y-4"></main>
@@ -143,26 +116,18 @@
 
         let members = [];
         let currentQ = 1, currentM = 1, currentW = 1;
+        let isDeleteMode = false;
 
-        window.onload = function() {
-            db.ref('schedule').on('value', snap => {
-                const data = snap.val();
-                if(data) {
-                    document.getElementById('view-date').innerText = data.date || '';
-                    document.getElementById('view-loc').innerText = data.loc || '';
-                    document.getElementById('view-time').innerText = data.time || '';
-                    document.getElementById('view-opp').innerText = data.opp || '';
-                    document.getElementById('sched-date').value = data.date || '';
-                    document.getElementById('sched-loc').value = data.loc || '';
-                    document.getElementById('sched-time').value = data.time || '';
-                    document.getElementById('sched-opp').value = data.opp || '';
-                }
-            });
-        };
+        // 초기 전광판 데이터 리딩
+        db.ref('schedule').on('value', snap => {
+            const data = snap.val() || {};
+            document.getElementById('view-loc').innerText = data.loc || '-';
+            document.getElementById('view-time').innerText = data.time || '-';
+            document.getElementById('view-opp').innerText = data.opp || '-';
+        });
 
         function checkPassword() {
-            const pw = document.getElementById('pw-input').value;
-            if(pw === '2025') {
+            if(document.getElementById('pw-input').value === '2025') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-app').classList.remove('hidden');
                 initAdmin();
@@ -170,7 +135,7 @@
         }
 
         function initAdmin() {
-            // 선수 테이블 fc_suji_v9 사용
+            // fc_suji_v9 테이블에서 선수 목록 실시간 수신
             db.ref('fc_suji_v9').on('value', snap => {
                 const val = snap.val();
                 members = val ? Object.keys(val).map(id => ({id, ...val[id]})) : [];
@@ -182,11 +147,9 @@
             currentQ = q;
             document.querySelectorAll('.q-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('q'+q).classList.add('active');
-
             const months = { 1:[1,2,3], 2:[4,5,6], 3:[7,8,9], 4:[10,11,12] };
-            const mWrap = document.getElementById('m-wrap');
-            mWrap.innerHTML = months[q].map(m => `
-                <button onclick="selectM(${m})" id="m${m}" class="m-btn flex-none px-5 h-10 border rounded-xl font-bold text-xs bg-white border-slate-200">${m}월</button>
+            document.getElementById('m-wrap').innerHTML = months[q].map(m => `
+                <button onclick="selectM(${m})" id="m${m}" class="m-btn flex-none px-5 h-10 border rounded-xl font-bold text-xs bg-white">${m}월</button>
             `).join('');
             selectM(months[q][0]);
         }
@@ -195,10 +158,8 @@
             currentM = m;
             document.querySelectorAll('.m-btn').forEach(b => b.classList.remove('active'));
             if(document.getElementById('m'+m)) document.getElementById('m'+m).classList.add('active');
-
-            const wWrap = document.getElementById('w-wrap');
-            wWrap.innerHTML = [1,2,3,4,5].map(w => `
-                <button onclick="selectW(${w})" id="w${w}" class="w-btn flex-none px-4 h-9 border rounded-lg font-bold text-[11px] bg-white border-slate-100">${w}주차</button>
+            document.getElementById('w-wrap').innerHTML = [1,2,3,4,5].map(w => `
+                <button onclick="selectW(${w})" id="w${w}" class="w-btn flex-none px-4 h-9 border rounded-lg font-bold text-[11px] bg-white">${w}주차</button>
             `).join('');
             selectW(1);
         }
@@ -208,62 +169,48 @@
             document.querySelectorAll('.w-btn').forEach(b => b.classList.remove('active'));
             if(document.getElementById('w'+w)) document.getElementById('w'+w).classList.add('active');
             
-            // 데이터 수신 및 포인트 합산 정렬 로직
-            db.ref(`attendance/m${currentM}/w${currentW}`).on('value', aSnap => {
-                const attendance = aSnap.val() || {};
-                renderList(attendance);
+            // 출석 데이터 리스너
+            db.ref(`attendance/m${currentM}/w${currentW}`).on('value', snap => {
+                renderList(snap.val() || {});
             });
         }
 
         function renderList(attendance) {
             const container = document.getElementById('list-container');
-            if(members.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-slate-400 font-bold">등록된 선수가 없습니다.</div>`;
-                return;
-            }
-
-            // 포인트 계산 및 가공
+            
+            // 포인트 계산 및 정렬
             let list = members.map(m => {
                 const cur = attendance[m.id] || { a: 0, t: 0 };
-                const totalPoint = (cur.a || 0) + (cur.t || 0); // a는 참석(3), t는 훈련(1씩 증가)
-                return { ...m, ...cur, totalPoint };
-            });
+                return { ...m, ...cur, total: (cur.a || 0) + (cur.t || 0) };
+            }).sort((a, b) => b.total - a.total);
 
-            // 포인트 순으로 정렬 (내림차순)
-            list.sort((a, b) => b.totalPoint - a.totalPoint);
-
-            container.innerHTML = list.map((m, index) => {
-                // 메달 결정 (1, 2, 3위)
-                let medal = "";
-                if(m.totalPoint > 0) {
-                    if(index === 0) medal = '<span class="medal-icon">🥇</span>';
-                    else if(index === 1) medal = '<span class="medal-icon">🥈</span>';
-                    else if(index === 2) medal = '<span class="medal-icon">🥉</span>';
-                }
+            container.innerHTML = list.map(m => {
+                // 메달 로직 적용: 0~10 동, 11~20 은, 21~ 금
+                let medal = "🥉"; 
+                if(m.total > 20) medal = "🥇";
+                else if(m.total > 10) medal = "🥈";
 
                 return `
-                <div class="member-card">
+                <div class="member-card ${isDeleteMode ? 'delete-mode' : ''}">
                     <div class="flex items-center gap-3">
-                        <button onclick="deleteMember('${m.id}', '${m.name}')" class="text-red-300 hover:text-red-400 text-xs">✕</button>
-                        <div class="flex flex-col items-center">
-                            ${medal}
-                            <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center font-black text-emerald-700">${m.name[0]}</div>
-                        </div>
+                        <button onclick="deleteMember('${m.id}', '${m.name}')" class="delete-btn text-red-500 font-bold mr-2">✕</button>
+                        <span class="medal-icon">${medal}</span>
+                        <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center font-black text-emerald-700">${m.name[0]}</div>
                         <div>
                             <div class="font-black text-slate-800">${m.name}</div>
-                            <div class="point-badge">POINT: ${m.totalPoint}</div>
+                            <div class="point-badge">Point: ${m.total}</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="toggleAttend('${m.id}', ${m.a || 0})" class="w-16 h-12 rounded-xl font-black text-[12px] transition-all ${m.a === 3 ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400'}">
+                        <button onclick="updatePoint('${m.id}', 'a', ${m.a === 3 ? 0 : 3})" class="w-16 h-12 rounded-xl font-black text-[12px] ${m.a === 3 ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}">
                             ${m.a === 3 ? '참 석' : '미 참'}
                         </button>
-                        <div class="flex flex-col items-center gap-1 bg-emerald-50 p-2 rounded-xl border border-emerald-100 min-w-[75px]">
-                            <span class="text-[9px] font-black text-emerald-600 uppercase">훈련 (+1)</span>
+                        <div class="flex flex-col items-center gap-1 bg-emerald-50 p-2 rounded-xl border border-emerald-100 min-w-[70px]">
+                            <span class="text-[9px] font-black text-emerald-600">훈련(+1)</span>
                             <div class="flex items-center gap-2">
-                                <button onclick="changeTrain('${m.id}', ${m.t || 0}, -1)" class="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm font-bold text-emerald-400">-</button>
+                                <button onclick="updatePoint('${m.id}', 't', ${(m.t || 0) - 1})" class="w-6 h-6 bg-white rounded shadow text-emerald-400 font-bold">-</button>
                                 <span class="w-4 text-center font-black text-emerald-700 text-xs">${m.t || 0}</span>
-                                <button onclick="changeTrain('${m.id}', ${m.t || 0}, 1)" class="w-6 h-6 flex items-center justify-center bg-white rounded-md shadow-sm font-bold text-emerald-600">+</button>
+                                <button onclick="updatePoint('${m.id}', 't', ${(m.t || 0) + 1})" class="w-6 h-6 bg-white rounded shadow text-emerald-600 font-bold">+</button>
                             </div>
                         </div>
                     </div>
@@ -271,15 +218,8 @@
             }).join('');
         }
 
-        // --- 포인트 업데이트 함수 (index.html 로직) ---
-        function toggleAttend(id, currentVal) {
-            const nextVal = currentVal === 3 ? 0 : 3;
-            db.ref(`attendance/m${currentM}/w${currentW}/${id}/a`).set(nextVal);
-        }
-
-        function changeTrain(id, currentVal, delta) {
-            const nextVal = Math.max(0, currentVal + delta);
-            db.ref(`attendance/m${currentM}/w${currentW}/${id}/t`).set(nextVal);
+        function updatePoint(id, type, val) {
+            db.ref(`attendance/m${currentM}/w${currentW}/${id}/${type}`).set(Math.max(0, val));
         }
 
         function addMember() {
@@ -287,16 +227,19 @@
             if(name) db.ref('fc_suji_v9').push({ name, pos: '선수' });
         }
 
+        function toggleDeleteMode() {
+            isDeleteMode = !isDeleteMode;
+            selectW(currentW); // 리렌더링
+        }
+
         function deleteMember(id, name) {
-            if(confirm(`[${name}] 선수를 삭제하시겠습니까?`)) {
+            if(confirm(`[${name}] 선수를 명단에서 삭제할까요?`)) {
                 db.ref(`fc_suji_v9/${id}`).remove();
             }
         }
 
-        function toggleInputArea() {
-            document.getElementById('input-area').classList.toggle('hidden');
-        }
-
+        function toggleInputArea() { document.getElementById('input-area').classList.toggle('hidden'); }
+        
         function saveSchedule() {
             const data = {
                 date: document.getElementById('sched-date').value,
@@ -304,11 +247,7 @@
                 time: document.getElementById('sched-time').value,
                 opp: document.getElementById('sched-opp').value
             };
-            if(!data.date || !data.opp) { alert("날짜와 상대팀은 필수입니다."); return; }
-            db.ref('schedule').set(data).then(() => {
-                alert("정보가 수정되었습니다.");
-                document.getElementById('input-area').classList.add('hidden');
-            });
+            db.ref('schedule').set(data).then(() => { alert("저장되었습니다."); toggleInputArea(); });
         }
     </script>
 </body>
