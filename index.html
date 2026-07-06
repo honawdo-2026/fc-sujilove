@@ -210,11 +210,30 @@
             if(document.getElementById('pw-input').value === '2026') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-app').classList.remove('hidden');
-                selectQ(1);
+                goToCurrentWeek();
             } else {
                 document.getElementById('error-msg').style.opacity = '1';
                 setTimeout(() => { document.getElementById('error-msg').style.opacity = '0'; }, 2000);
             }
+        }
+
+        // 로그인 시 '오늘 기준 현재 주'로 자동 이동
+        // (경기는 일요일 기준: 오늘 포함 가장 최근에 지난 일요일을 현재 주로 잡음)
+        function goToCurrentWeek() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const sunday = new Date(today);
+            sunday.setDate(today.getDate() - today.getDay()); // 일요일이면 오늘, 아니면 직전 일요일
+
+            const month = sunday.getMonth() + 1;
+            const quarter = Math.ceil(month / 3);
+            const sundays = getSundays(sunday.getFullYear(), month);
+            let week = sundays.indexOf(sunday.getDate()) + 1;
+            if (week < 1) week = 1;
+
+            selectQ(quarter);
+            selectM(month);
+            selectW(week);
         }
 
         function selectQ(q) {
