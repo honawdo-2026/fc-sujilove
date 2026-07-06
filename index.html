@@ -137,7 +137,6 @@
                 <h2 class="app-title-main text-sm text-emerald-600 italic uppercase">Manager Mode</h2>
                 <div class="flex gap-1">
                     <button onclick="addMember()" class="text-[10px] bg-emerald-600 text-white px-3 py-1.5 rounded-full font-black">추가</button>
-                    <button onclick="editMember()" class="text-[10px] bg-indigo-600 text-white px-3 py-1.5 rounded-full font-black">수정</button>
                     <button onclick="deleteMember()" class="text-[10px] bg-slate-800 text-white px-3 py-1.5 rounded-full font-black">삭제</button>
                 </div>
             </div>
@@ -257,7 +256,10 @@
                     <div class="flex items-center gap-3">
                         <span class="text-xl">${medal}</span>
                         <div>
-                            <div class="text-base font-black text-slate-800">${m.name}</div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-base font-black text-slate-800">${m.name}</span>
+                                <button onclick="editMemberById(${m.id})" class="text-[9px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-black active:bg-indigo-600 active:text-white">수정</button>
+                            </div>
                             <div class="text-[12px] font-bold text-indigo-600">${cum}P 누적</div>
                         </div>
                     </div>
@@ -287,11 +289,9 @@
             if((pData[k].t || 0) + v >= 0) { pData[k].t = (pData[k].t || 0) + v; db.ref('fc_suji_v9/points').set(pData); }
         }
         function addMember() { const n = prompt('이름:'); if(n) { members.push({id: Date.now(), name: n}); db.ref('fc_suji_v9/members').set(members); } }
-        function editMember() {
-            const oldName = prompt('수정할 선수 이름:');
-            if (!oldName) return;
-            const member = members.find(m => m.name === oldName.trim());
-            if (!member) { alert('해당 이름의 선수를 찾을 수 없습니다.'); return; }
+        function editMemberById(id) {
+            const member = members.find(m => m.id === id);
+            if (!member) return;
             const newName = prompt('새 이름을 입력하세요:', member.name);
             if (newName && newName.trim() && newName.trim() !== member.name) {
                 member.name = newName.trim();
